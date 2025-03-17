@@ -1,0 +1,32 @@
+{
+  "pages": [
+    "pages/coachX/coachX",
+    "pages/students/students",
+    "pages/training/training",
+    "pages/planDetail/planDetail",
+    "pages/index/index",
+    "pages/logs/logs"
+  ],
+  "window": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "智能教练助手",
+    "navigationBarBackgroundColor": "#07C160",
+    "backgroundTextStyle": "light"
+  },
+  "style": "v2",
+  "componentFramework": "glass-easel",
+  "lazyCodeLoading": "requiredComponents",
+  "sitemapLocation": "sitemap.json",
+  "permission": {
+    "scope.userLocation": {
+      "desc": "您的位置信息将用于为您提供更好的服务"
+    }
+  },
+  "requiredPrivateInfos": [
+    "chooseLocation"
+  ],
+  "usingComponents": {},
+  "shareOptions": {
+    "showShareMenu": true
+  }
+}

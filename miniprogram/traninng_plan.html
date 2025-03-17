@@ -1,0 +1,208 @@
+  
+  <!-- 智能训练计划页面 -->
+  <div class="container container-with-tabs hidden" id="training-plan-page">
+    <div class="header">
+      智能训练计划
+    </div>
+    
+    <div style="padding: 16px;">
+      <!-- AI智能训练计划卡片
+      <div class="card ai-card">
+        <div class="ai-icon-bg">📊</div>
+        <h3 style="margin-bottom: 12px; font-weight: bold; font-size: 18px;">AI训练规划</h3>
+        
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">
+          <button class="ai-button">
+            <span style="margin-right: 6px;">✨</span>智能生成训练计划
+          </button>
+          <button class="ai-button">
+            <span style="margin-right: 6px;">📈</span>批量优化现有计划
+          </button>
+          <button class="ai-button">
+            <span style="margin-right: 6px;">📊</span>计划效果分析
+          </button>
+          <button class="ai-button">
+            <span style="margin-right: 6px;">🔄</span>根据进度调整
+          </button>
+        </div>
+      </div> -->
+      
+      <!-- 智能提示卡片 -->
+      <div class="ai-insight">
+        <div style="display: flex; align-items: flex-start;">
+          <div style="padding: 8px; background: #E3F2FD; border-radius: 50%; margin-right: 12px;">
+            <span style="color: #2196F3; font-size: 16px;">💡</span>
+          </div>
+          <div>
+            <div style="font-weight: bold; margin-bottom: 4px;">AI训练见解</div>
+            <div style="font-size: 14px;">根据最近数据，3名学员的训练计划需要更新。张三的卧推进步迅速，建议增加重量。李四的减脂计划效果不佳，建议调整饮食方案。</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 搜索与过滤选项 -->
+      <div style="margin-bottom: 16px; display: flex; align-items: center;">
+        <input type="text" placeholder="搜索学员或计划..." style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 8px;">
+        <select style="margin-left: 8px; padding: 8px; border: 1px solid #ddd; border-radius: 8px;">
+          <option>所有计划</option>
+          <option>增肌计划</option>
+          <option>减脂计划</option>
+          <option>力量计划</option>
+        </select>
+      </div>
+      
+      <!-- 计划模板管理 -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h3>AI优化计划模板</h3>
+          <button class="ai-analyze-button" style="font-size: 12px; display: flex; align-items: center;">
+            <span style="margin-right: 4px;">🤖</span> 创建智能模板
+          </button>
+        </div>
+        
+        <div style="display: flex; overflow-x: auto; padding: 8px 0;">
+          <div style="min-width: 160px; margin-right: 12px; padding: 12px; background: #f2f2f2; border-radius: 8px; cursor: pointer; border-left: 3px solid #2196F3;">
+            <div style="font-weight: bold;">初级增肌计划</div>
+            <div style="font-size: 12px; color: #666; margin-top: 4px;">3天训练/周</div>
+            <div style="font-size: 12px; margin-top: 4px;">使用中: 5名学员</div>
+            <div style="font-size: 11px; color: #2196F3; margin-top: 4px;">AI优化版本</div>
+          </div>
+          
+          <div style="min-width: 160px; margin-right: 12px; padding: 12px; background: #f2f2f2; border-radius: 8px; cursor: pointer; border-left: 3px solid #2196F3;">
+            <div style="font-weight: bold;">中级增肌计划</div>
+            <div style="font-size: 12px; color: #666; margin-top: 4px;">4天训练/周</div>
+            <div style="font-size: 12px; margin-top: 4px;">使用中: 3名学员</div>
+            <div style="font-size: 11px; color: #2196F3; margin-top: 4px;">AI优化版本</div>
+          </div>
+          
+          <div style="min-width: 160px; margin-right: 12px; padding: 12px; background: #f2f2f2; border-radius: 8px; cursor: pointer;">
+            <div style="font-weight: bold;">高强度减脂计划</div>
+            <div style="font-size: 12px; color: #666; margin-top: 4px;">5天训练/周</div>
+            <div style="font-size: 12px; margin-top: 4px;">使用中: 4名学员</div>
+            <div style="font-size: 11px; color: #F44336; margin-top: 4px;">可优化</div>
+          </div>
+          
+          <div style="min-width: 160px; margin-right: 12px; padding: 12px; background: #f2f2f2; border-radius: 8px; cursor: pointer;">
+            <div style="font-weight: bold;">力量训练计划</div>
+            <div style="font-size: 12px; color: #666; margin-top: 4px;">4天训练/周</div>
+            <div style="font-size: 12px; margin-top: 4px;">使用中: 2名学员</div>
+            <div style="font-size: 11px; color: #F44336; margin-top: 4px;">可优化</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 学员计划管理 -->
+      <div style="margin: 20px 0 12px 0;">
+        <h3>所有学员训练计划</h3>
+      </div>
+      
+      <div class="card" style="padding: 0; margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee;">
+          <div style="display: flex; align-items: center;">
+            <div class="avatar" style="width: 40px; height: 40px; margin-right: 12px;">张</div>
+            <div>
+              <div style="font-weight: bold;">张三</div>
+              <div style="font-size: 12px;">
+                <span class="tag tag-bulking">增肌期</span>
+                <span class="tag">第8周</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div style="text-align: right; font-size: 14px;">初级增肌计划</div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button style="background: none; border: none; color: #07C160; cursor: pointer;">编辑</button>
+            <button class="view-plan-btn" style="background: none; border: none; color: #07C160; cursor: pointer;">查看</button>
+          </div>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee;">
+          <div style="display: flex; align-items: center;">
+            <div class="avatar" style="width: 40px; height: 40px; margin-right: 12px;">王</div>
+            <div>
+              <div style="font-weight: bold;">王五</div>
+              <div style="font-size: 12px;">
+                <span class="tag tag-maintenance">维持期</span>
+                <span class="tag">第12周</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div style="text-align: right; font-size: 14px;">中级增肌计划</div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button style="background: none; border: none; color: #07C160; cursor: pointer;">编辑</button>
+            <button class="view-plan-btn" style="background: none; border: none; color: #07C160; cursor: pointer;">查看</button>
+          </div>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px;">
+          <div style="display: flex; align-items: center;">
+            <div class="avatar" style="width: 40px; height: 40px; margin-right: 12px;">钱</div>
+            <div>
+              <div style="font-weight: bold;">钱七</div>
+              <div style="font-size: 12px;">
+                <span class="tag tag-cutting">减脂期</span>
+                <span class="tag">第2周</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div style="text-align: right; font-size: 14px;">高强度减脂计划</div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button style="background: none; border: none; color: #07C160; cursor: pointer;">编辑</button>
+            <button class="view-plan-btn" style="background: none; border: none; color: #07C160; cursor: pointer;">查看</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 批量操作按钮 -->
+      <div style="display: flex; margin-top: 20px;">
+        <button class="button" style="flex: 1; display: flex; align-items: center; justify-content: center;">
+          <span style="margin-right: 8px;">🤖</span> 批量AI优化计划
+        </button>
+      </div>
+      
+      <!-- 创建新计划按钮 -->
+      <div style="margin-top: 16px; text-align: center;">
+        <button class="button" style="width: 100%; display: flex; align-items: center; justify-content: center;">
+          <span style="font-size: 20px; margin-right: 8px;">+</span> 创建新计划
+        </button>
+      </div>
+          
+    <div class="tab-bar">
+      <div class="tab" data-tab="assistant">
+        <div class="tab-icon">🤖</div>
+        <div>AI助手</div>
+      </div>
+      <div class="tab" data-tab="students">
+        <div class="tab-icon">👥</div>
+        <div>学员</div>
+      </div>
+      <div class="tab active" data-tab="training">
+        <div class="tab-icon">📋</div>
+        <div>训练计划</div>
+      </div>
+    </div>
+    </div>
+  </div>
+      </div>
+    </div>
+    
+    <div class="tab-bar">
+      <div class="tab active" data-tab="assistant">
+        <div class="tab-icon">🤖</div>
+        <div>AI助手</div>
+      </div>
+      <div class="tab" data-tab="students">
+        <div class="tab-icon">👥</div>
+        <div>学员</div>
+      </div>
+      <div class="tab" data-tab="training">
+        <div class="tab-icon">📋</div>
+        <div>训练计划</div>
+      </div>
+    </div>
+  </div>

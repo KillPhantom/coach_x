@@ -1,0 +1,520 @@
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>智能健身教练助手小程序</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      }
+
+      body {
+        background-color: #f6f6f6;
+        color: #333;
+        font-size: 14px;
+      }
+
+      .container {
+        width: 375px;
+        margin: 0 auto;
+        background: white;
+        min-height: 100vh;
+        position: relative;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .header {
+        padding: 16px;
+        background: #07c160;
+        color: white;
+        font-size: 18px;
+        text-align: center;
+        position: relative;
+        font-weight: bold;
+      }
+
+      .back-button {
+        position: absolute;
+        left: 16px;
+        top: 16px;
+        font-size: 18px;
+        cursor: pointer;
+      }
+
+      .card {
+        margin: 12px;
+        padding: 16px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .ai-card {
+        background: linear-gradient(135deg, #0acffe 0%, #495aff 100%);
+        color: white;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .ai-icon-bg {
+        position: absolute;
+        top: -15px;
+        right: -15px;
+        font-size: 80px;
+        opacity: 0.2;
+      }
+
+      .student-card {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        margin: 0 12px 8px 12px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+
+      .avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #e8f5e9;
+        margin-right: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #07c160;
+        font-weight: bold;
+        font-size: 18px;
+      }
+
+      .student-info {
+        flex: 1;
+      }
+
+      .student-name {
+        font-weight: bold;
+        margin-bottom: 4px;
+      }
+
+      .student-status {
+        font-size: 12px;
+        color: #666;
+      }
+
+      .tag {
+        display: inline-block;
+        font-size: 10px;
+        background: #f2f2f2;
+        color: #666;
+        padding: 2px 6px;
+        border-radius: 10px;
+        margin-right: 6px;
+      }
+
+      .tag-bulking {
+        background: #e6f7ff;
+        color: #1890ff;
+      }
+
+      .tag-cutting {
+        background: #fff7e6;
+        color: #fa8c16;
+      }
+
+      .tag-maintenance {
+        background: #f6ffed;
+        color: #52c41a;
+      }
+
+      .section-title {
+        font-weight: bold;
+        margin: 16px 0 8px 16px;
+        padding-left: 12px;
+        border-left: 3px solid #07c160;
+      }
+
+      .workout-item,
+      .meal-item,
+      .supplement-item {
+        padding: 12px;
+        background: #f9f9f9;
+        border-radius: 10px;
+        margin: 0 12px 8px 12px;
+      }
+
+      .ai-workout-item {
+        border-left: 3px solid #2196f3;
+      }
+
+      .comment-section {
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px dashed #eee;
+      }
+
+      .comment-input {
+        display: flex;
+        margin-top: 8px;
+      }
+
+      .comment-input input {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      .comment-input button {
+        padding: 8px 12px;
+        background: #07c160;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        margin-left: 8px;
+      }
+
+      .plan-day {
+        margin: 0 12px 16px 12px;
+        background: #f9f9f9;
+        border-radius: 12px;
+        padding: 12px;
+      }
+
+      .day-title {
+        font-weight: bold;
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .tab-bar {
+        display: flex;
+        background: white;
+        border-top: 1px solid #eee;
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 375px;
+        height: 56px;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .tab {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        color: #999;
+        cursor: pointer;
+      }
+
+      .tab.active {
+        color: #07c160;
+      }
+
+      .tab-icon {
+        font-size: 22px;
+        margin-bottom: 4px;
+      }
+
+      .container-with-tabs {
+        padding-bottom: 60px;
+      }
+
+      .button {
+        background: #07c160;
+        color: white;
+        border: none;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .button-outline {
+        background: white;
+        color: #07c160;
+        border: 1px solid #07c160;
+      }
+
+      .ai-button {
+        padding: 8px 14px;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        border-radius: 20px;
+        color: white;
+        font-size: 13px;
+        backdrop-filter: blur(5px);
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+      }
+
+      .ai-button:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .ai-action-button {
+        background: #f44336;
+        color: white;
+        border: none;
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+      }
+
+      .ai-analyze-button {
+        background: #2196f3;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      .stat-card {
+        background: white;
+        border-radius: 10px;
+        padding: 12px;
+        text-align: center;
+        flex: 1;
+        margin: 0 4px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .stat-number {
+        font-size: 24px;
+        font-weight: bold;
+        color: #07c160;
+      }
+
+      .stat-label {
+        font-size: 12px;
+        color: #666;
+        margin-top: 4px;
+      }
+
+      .ai-insight {
+        border-left: 4px solid #2196f3;
+        background: #e3f2fd;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- AI助手页面 -->
+    <div class="container container-with-tabs" id="ai-assistant-page">
+      <div class="header">智能教练助手</div>
+
+      <!-- AI功能卡片 -->
+      <div class="card ai-card">
+        <div class="ai-icon-bg">🤖</div>
+        <h3 style="margin-bottom: 14px; font-weight: bold; font-size: 18px">
+          AI助手
+        </h3>
+
+        <div
+          style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px"
+        >
+          <button class="ai-button">
+            <span style="margin-right: 6px">📊</span>一键生成训练报告
+          </button>
+          <button class="ai-button">
+            <span style="margin-right: 6px">🔔</span>智能提醒管理
+          </button>
+          <button class="ai-button">
+            <span style="margin-right: 6px">📈</span>训练计划优化
+          </button>
+          <button class="ai-button">
+            <span style="margin-right: 6px">📋</span>数据分析报告
+          </button>
+        </div>
+
+        <div style="font-size: 12px; margin-top: 8px">
+          上次AI分析: 今天 08:32
+        </div>
+      </div>
+
+      <!-- 快速信息卡片 -->
+      <div class="card">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+          "
+        >
+          <h3>今日概览</h3>
+          <div
+            style="
+              font-size: 12px;
+              color: #999;
+              display: flex;
+              align-items: center;
+            "
+          >
+            <span style="margin-right: 4px">🤖</span>AI生成
+          </div>
+        </div>
+
+        <div
+          style="
+            display: flex;
+            text-align: center;
+            justify-content: space-around;
+            margin-bottom: 12px;
+          "
+        >
+          <div>
+            <div style="font-size: 24px; font-weight: bold; color: #07c160">
+              8
+            </div>
+            <div style="font-size: 12px; color: #666">已完成训练</div>
+          </div>
+          <div>
+            <div style="font-size: 24px; font-weight: bold; color: #ff9800">
+              5
+            </div>
+            <div style="font-size: 12px; color: #666">需要提醒</div>
+          </div>
+          <div>
+            <div style="font-size: 24px; font-weight: bold; color: #2196f3">
+              3
+            </div>
+            <div style="font-size: 12px; color: #666">计划待更新</div>
+          </div>
+        </div>
+
+        <div
+          style="
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            font-size: 14px;
+          "
+        >
+          <div
+            style="
+              font-weight: bold;
+              margin-bottom: 4px;
+              display: flex;
+              align-items: center;
+            "
+          >
+            <span style="margin-right: 6px">💡</span>AI建议
+          </div>
+          <div>
+            张三和李四的训练进度超出预期，建议调整计划强度。王五需要增加肩部训练频率，胸部发展良好。
+          </div>
+        </div>
+      </div>
+
+      <!-- 需要注意的学员 -->
+      <div style="margin: 16px 12px 8px 12px">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <h3>需要注意的学员</h3>
+          <div
+            style="color: #07c160; font-size: 14px; cursor: pointer"
+            id="view-all-students"
+          >
+            全部查看
+          </div>
+        </div>
+      </div>
+
+      <div class="student-card" style="border-left: 3px solid #f44336">
+        <div class="avatar" style="background: #ffebee; color: #f44336">李</div>
+        <div class="student-info">
+          <div class="student-name">李四</div>
+          <div class="student-status" style="color: #f44336">2天未更新状态</div>
+          <div>
+            <span class="tag tag-cutting">减脂期</span>
+          </div>
+        </div>
+        <div>
+          <button class="ai-action-button">
+            <span style="margin-right: 4px">🔔</span>提醒
+          </button>
+        </div>
+      </div>
+
+      <div class="student-card" style="border-left: 3px solid #f44336">
+        <div class="avatar" style="background: #ffebee; color: #f44336">钱</div>
+        <div class="student-info">
+          <div class="student-name">钱七</div>
+          <div class="student-status" style="color: #f44336">5天未更新状态</div>
+          <div>
+            <span class="tag tag-cutting">减脂期</span>
+          </div>
+        </div>
+        <div>
+          <button class="ai-action-button">
+            <span style="margin-right: 4px">🔔</span>提醒
+          </button>
+        </div>
+      </div>
+
+      <div class="student-card" style="border-left: 3px solid #2196f3">
+        <div class="avatar" style="background: #e3f2fd; color: #2196f3">赵</div>
+        <div class="student-info">
+          <div class="student-name">赵六</div>
+          <div class="student-status" style="color: #2196f3">
+            距离比赛还有16天
+          </div>
+          <div>
+            <span class="tag tag-bulking">备赛</span>
+          </div>
+        </div>
+        <div>
+          <button class="ai-action-button" style="background: #2196f3">
+            <span style="margin-right: 4px">📝</span>更新
+          </button>
+        </div>
+      </div>
+
+      <div class="tab-bar">
+        <div class="tab" data-tab="assistant">
+          <div class="tab-icon">🤖</div>
+          <div>AI助手</div>
+        </div>
+        <div class="tab active" data-tab="students">
+          <div class="tab-icon">👥</div>
+          <div>学员</div>
+        </div>
+        <div class="tab" data-tab="training">
+          <div class="tab-icon">📋</div>
+          <div>训练计划</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

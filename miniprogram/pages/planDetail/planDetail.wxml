@@ -1,0 +1,230 @@
+<!-- 训练计划详情页面 -->
+<view class="header" style="padding-top: {{statusBarHeight}}px;">
+  <view class="back-button" bindtap="goBack">←</view>
+  训练计划详情
+</view>
+
+<view class="container container-with-tabs">
+  <view class="content-wrapper">
+    <view class="student-header">
+      <view class="avatar" style="{{student.avatarStyle}}">{{student.avatar}}</view>
+      <view class="student-info">
+        <view class="student-name">{{student.name}} - {{student.planName}}</view>
+        <view class="student-tags">
+          <text class="tag {{student.phaseTagClass}}">{{student.phase}}</text>
+          <text class="tag">第{{student.week}}周</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 身体状态栏 -->
+    <view class="body-stats">
+      <view class="stat-item">
+        <view class="stat-value">{{student.height}}cm</view>
+        <view class="stat-label">身高</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value">{{student.weight}}kg</view>
+        <view class="stat-label">体重</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value {{student.weightChange > 0 ? 'increase' : (student.weightChange < 0 ? 'decrease' : '')}}">
+          {{student.weightChange > 0 ? '+' : ''}}{{student.weightChange}}kg
+        </view>
+        <view class="stat-label">本周变化</view>
+      </view>
+    </view>
+    
+    <!-- AI分析卡片 -->
+    <view class="ai-insight">
+      <view class="ai-insight-container">
+        <view class="ai-insight-icon">
+          <text>🤖</text>
+        </view>
+        <view class="ai-insight-content">
+          <view class="ai-insight-title">AI训练分析</view>
+          <view class="ai-insight-text">
+            <text wx:if="{{loading.aiAnalysis}}">加载中...</text>
+            <block wx:else>
+              <view>根据{{student.name}}的训练历史和身体数据，以下是AI的建议：</view>
+              <view class="ai-suggestions">
+                <view class="ai-suggestion-item" wx:for="{{aiAnalysis.suggestions}}" wx:key="index">
+                  • {{item}}
+                </view>
+              </view>
+              <view class="ai-analysis-source">
+                分析基于最近{{aiAnalysis.weeks}}周的训练数据和{{aiAnalysis.tests}}次体测结果
+              </view>
+            </block>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 内置标签页 -->
+    <view class="plan-tabs">
+      <view class="plan-tab {{activeTab === 'training' ? 'active' : ''}}" bindtap="switchPlanTab" data-tab="training">
+        训练动作
+      </view>
+      <view class="plan-tab {{activeTab === 'diet' ? 'active' : ''}}" bindtap="switchPlanTab" data-tab="diet">
+        饮食计划
+      </view>
+      <view class="plan-tab {{activeTab === 'supplements' ? 'active' : ''}}" bindtap="switchPlanTab" data-tab="supplements">
+        补剂建议
+      </view>
+    </view>
+
+    <!-- 训练动作内容 -->
+    <view class="tab-content" wx:if="{{activeTab === 'training'}}">
+      <block wx:for="{{trainingDays}}" wx:key="day" wx:for-index="dayIndex">
+        <view class="plan-day">
+          <view class="day-title">
+            <view>{{item.day}} ({{item.focus}})</view>
+            <view class="day-actions">
+              <text class="day-action-btn" bindtap="addExercise" data-day-index="{{dayIndex}}">+</text>
+              <text class="day-menu">⋯</text>
+            </view>
+          </view>
+          
+          <view wx:for="{{item.exercises}}" wx:for-item="exercise" wx:key="name" wx:for-index="exerciseIndex"
+                class="workout-item {{exercise.highlight ? 'highlight-' + exercise.highlight : ''}}">
+            <view class="workout-header">
+              <view>{{exercise.name}}</view>
+              <view>{{exercise.sets}}组 x {{exercise.reps}}</view>
+            </view>
+            <view class="workout-target">目标重量: {{exercise.weight}}</view>
+            <view class="item-actions">
+              <text class="edit-btn" bindtap="editExercise" data-day-index="{{dayIndex}}" data-exercise-index="{{exerciseIndex}}">编辑</text>
+              <text class="delete-btn" bindtap="deleteExercise" data-day-index="{{dayIndex}}" data-exercise-index="{{exerciseIndex}}">删除</text>
+            </view>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <!-- 饮食计划内容 -->
+    <view class="tab-content" wx:if="{{activeTab === 'diet'}}">
+      <view class="plan-day">
+        <view class="day-title">
+          <view>每日饮食计划</view>
+          <view class="day-actions">
+            <text class="day-action-btn" bindtap="editMacros">编辑宏量</text>
+          </view>
+        </view>
+        
+        <view class="diet-overview">
+          <view class="diet-macro">
+            <view class="diet-macro-value">{{dietPlan.calories}}kcal</view>
+            <view class="diet-macro-label">总热量</view>
+          </view>
+          <view class="diet-macro">
+            <view class="diet-macro-value">{{dietPlan.protein}}g</view>
+            <view class="diet-macro-label">蛋白质</view>
+          </view>
+          <view class="diet-macro">
+            <view class="diet-macro-value">{{dietPlan.carbs}}g</view>
+            <view class="diet-macro-label">碳水</view>
+          </view>
+          <view class="diet-macro">
+            <view class="diet-macro-value">{{dietPlan.fat}}g</view>
+            <view class="diet-macro-label">脂肪</view>
+          </view>
+        </view>
+        
+        <view class="meal-section" wx:for="{{dietPlan.meals}}" wx:key="name" wx:for-index="mealIndex">
+          <view class="meal-header">
+            <view>
+              <view class="meal-title">{{item.name}}</view>
+              <view class="meal-time">{{item.time}}</view>
+            </view>
+            <view class="meal-actions">
+              <text class="meal-action-btn" bindtap="addFood" data-meal-index="{{mealIndex}}">+</text>
+            </view>
+          </view>
+          
+          <view class="meal-item" wx:for="{{item.foods}}" wx:for-item="food" wx:key="name" wx:for-index="foodIndex">
+            <view class="meal-item-name">{{food.name}}</view>
+            <view class="meal-item-amount">{{food.amount}}</view>
+            <view class="item-actions">
+              <text class="edit-btn" bindtap="editFood" data-meal-index="{{mealIndex}}" data-food-index="{{foodIndex}}">编辑</text>
+              <text class="delete-btn" bindtap="deleteFood" data-meal-index="{{mealIndex}}" data-food-index="{{foodIndex}}">删除</text>
+            </view>
+          </view>
+        </view>
+        
+        <view class="add-meal-btn" bindtap="addMeal">
+          <text>+ 添加餐次</text>
+        </view>
+        
+        <view class="diet-notes" wx:if="{{dietPlan.notes}}">
+          <view class="diet-notes-header">
+            <view class="diet-notes-title">注意事项</view>
+            <view class="diet-notes-action">
+              <text class="edit-btn" bindtap="editDietNotes">编辑</text>
+            </view>
+          </view>
+          <view class="diet-notes-content">{{dietPlan.notes}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 补剂建议内容 -->
+    <view class="tab-content" wx:if="{{activeTab === 'supplements'}}">
+      <view class="plan-day">
+        <view class="day-title">
+          <view>补剂建议</view>
+          <view class="day-actions">
+            <text class="day-action-btn" bindtap="addSupplement">+ 添加补剂</text>
+          </view>
+        </view>
+        
+        <view class="supplement-item" wx:for="{{supplements}}" wx:key="name" wx:for-index="supplementIndex">
+          <view class="supplement-header">
+            <view class="supplement-name">{{item.name}}</view>
+            <view class="supplement-dosage">{{item.dosage}}</view>
+          </view>
+          <view class="supplement-timing">服用时间: {{item.timing}}</view>
+          <view class="supplement-purpose">目的: {{item.purpose}}</view>
+          <view class="item-actions">
+            <text class="edit-btn" bindtap="editSupplement" data-supplement-index="{{supplementIndex}}">编辑</text>
+            <text class="delete-btn" bindtap="deleteSupplement" data-supplement-index="{{supplementIndex}}">删除</text>
+          </view>
+        </view>
+        
+        <view class="supplement-notes" wx:if="{{supplementNotes}}">
+          <view class="supplement-notes-header">
+            <view class="supplement-notes-title">补充说明</view>
+            <view class="supplement-notes-action">
+              <text class="edit-btn" bindtap="editSupplementNotes">编辑</text>
+            </view>
+          </view>
+          <view class="supplement-notes-content">{{supplementNotes}}</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 操作按钮 -->
+    <view class="action-buttons">
+      <button class="button button-outline" bindtap="goBack">返回</button>
+      <button class="button button-primary" bindtap="applyAISuggestions">
+        <text class="button-icon">🤖</text> 应用AI建议
+      </button>
+    </view>
+  </view>
+  
+  <!-- 底部导航栏 -->
+  <view class="tab-bar">
+    <view class="tab {{currentTab === 'assistant' ? 'active' : ''}}" bindtap="switchTab" data-tab="assistant">
+      <view class="tab-icon">🤖</view>
+      <view>AI助手</view>
+    </view>
+    <view class="tab {{currentTab === 'students' ? 'active' : ''}}" bindtap="switchTab" data-tab="students">
+      <view class="tab-icon">👥</view>
+      <view>学员</view>
+    </view>
+    <view class="tab {{currentTab === 'training' ? 'active' : ''}}" bindtap="switchTab" data-tab="training">
+      <view class="tab-icon">📋</view>
+      <view>训练计划</view>
+    </view>
+  </view>
+</view> 

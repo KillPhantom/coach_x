@@ -1,0 +1,111 @@
+<!-- 学员列表页面 -->
+<view class="header" style="padding-top: {{statusBarHeight}}px;">
+  学员管理
+</view>
+
+<view class="container container-with-tabs">
+  <!-- 搜索与过滤 -->
+  <view class="search-filter">
+    <input type="text" placeholder="搜索学员..." class="search-input" bindinput="onSearchInput" />
+    <picker bindchange="onFilterChange" value="{{filterIndex}}" range="{{filterOptions}}">
+      <view class="filter-select">
+        {{filterOptions[filterIndex]}}
+      </view>
+    </picker>
+  </view>
+  
+  <!-- 学员统计 -->
+  <view class="stat-cards">
+    <view wx:if="{{loading.stats}}" class="loading-container">
+      <view class="loading-text">加载中...</view>
+    </view>
+    <view wx:else class="stat-cards-content">
+      <view class="stat-card {{filterIndex === 0 ? 'selected' : ''}}" bindtap="filterByType" data-type="all">
+        <view class="stat-number">{{stats.total}}</view>
+        <view class="stat-label">总学员</view>
+      </view>
+      <view class="stat-card {{filterIndex === 1 ? 'selected' : ''}}" bindtap="filterByType" data-type="active">
+        <view class="stat-number">{{stats.active}}</view>
+        <view class="stat-label">活跃学员</view>
+      </view>
+      <view class="stat-card {{filterIndex === 2 ? 'selected' : ''}}" bindtap="filterByType" data-type="needAttention">
+        <view class="stat-number">{{stats.needAttention}}</view>
+        <view class="stat-label">需要关注</view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 学员列表标题 -->
+  <view class="section-header">
+    <view class="section-title">所有学员</view>
+    <view class="add-btn" bindtap="addNewStudent">
+      <text class="add-icon">+</text>添加学员
+    </view>
+  </view>
+  
+  <!-- 学员列表 -->
+  <scroll-view 
+    scroll-y="true" 
+    class="student-scroll-view"
+    style="height: {{scrollHeight}}px;" 
+    bindscrolltolower="onScrollToLower"
+    enable-back-to-top="true"
+    enhanced="true"
+    show-scrollbar="false">
+    
+    <view wx:if="{{loading.students && !isLoadingMore}}" class="loading-container">
+      <view class="loading-text">加载中...</view>
+    </view>
+    
+    <block wx:else>
+      <view class="student-card" 
+            wx:for="{{students}}" 
+            wx:key="id" 
+            bindtap="viewStudentDetail" 
+            data-student-id="{{item.id}}">
+        <view class="avatar" style="{{item.avatarStyle}}">{{item.avatar}}</view>
+        <view class="student-info">
+          <view class="student-name">{{item.name}}</view>
+          <view class="student-status" style="{{item.statusStyle}}">{{item.status}}</view>
+          <view>
+            <text class="tag {{item.tagClass}}">{{item.tag}}</text>
+          </view>
+        </view>
+        <view class="student-action">
+          <button class="view-student-btn" catchtap="viewStudentDetail" data-student-id="{{item.id}}">查看</button>
+        </view>
+      </view>
+      
+      <!-- 加载更多提示 -->
+      <view wx:if="{{isLoadingMore}}" class="loading-more">
+        <view class="loading-text">加载更多...</view>
+      </view>
+      
+      <!-- 没有更多数据提示 -->
+      <view wx:if="{{!pagination.hasMore && students.length > 0}}" class="no-more-data">
+        <view class="no-more-text">没有更多数据了</view>
+      </view>
+      
+      <!-- 没有数据提示 -->
+      <view wx:if="{{!loading.students && students.length === 0}}" class="no-data">
+        <view class="no-data-text">暂无学员数据</view>
+      </view>
+    </block>
+  </scroll-view>
+  
+  <!-- 底部导航栏 -->
+  <view class="tab-bar">
+    <view class="tab {{currentTab === 'assistant' ? 'active' : ''}}" bindtap="switchTab" data-tab="assistant">
+      <view class="tab-icon">🤖</view>
+      <view>AI助手</view>
+    </view>
+    <view class="tab {{currentTab === 'students' ? 'active' : ''}}" bindtap="switchTab" data-tab="students">
+      <view class="tab-icon">👥</view>
+      <view>学员</view>
+    </view>
+    <view class="tab {{currentTab === 'training' ? 'active' : ''}}" bindtap="switchTab" data-tab="training">
+      <view class="tab-icon">📋</view>
+      <view>训练计划</view>
+    </view>
+  </view>
+</view> 
