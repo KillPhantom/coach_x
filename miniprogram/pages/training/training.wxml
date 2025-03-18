@@ -72,12 +72,12 @@
     </view>
     
     <view class="plan-list-card">
-      <view wx:if="{{loading.studentPlans}}" class="loading-container">
+      <view wx:if="{{loading.students}}" class="loading-container">
         <view class="loading-text">加载中...</view>
       </view>
       
       <block wx:else>
-        <view class="plan-item" wx:for="{{studentPlans}}" wx:key="id">
+        <view class="plan-item" wx:for="{{students}}" wx:key="id">
           <view class="plan-student-info">
             <view class="avatar" style="{{item.avatarStyle}}">{{item.avatar}}</view>
             <view class="student-info-text">

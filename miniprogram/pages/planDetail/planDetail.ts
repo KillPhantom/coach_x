@@ -1,5 +1,9 @@
 // 训练计划详情页面
 import { request } from "../../utils/request";
+import { PageData, Student, AIAnalysis } from "./models";
+import * as TrainingController from "./trainingController";
+import * as DietController from "./dietController";
+import * as SupplementController from "./supplementController";
 
 interface Student {
   id: number;
@@ -21,12 +25,16 @@ interface AIAnalysis {
   tests: number;
 }
 
+interface ExerciseSet {
+  weight: string;
+  reps: string;
+}
+
 interface Exercise {
   name: string;
-  sets: number;
-  reps: string;
-  weight: string;
-  highlight?: string; // green, orange, red
+  sets: ExerciseSet[];
+  note?: string;
+  highlight?: string;
 }
 
 interface TrainingDay {
@@ -80,7 +88,7 @@ Page({
     dietPlan: {} as DietPlan,
     supplements: [] as Supplement[],
     supplementNotes: "",
-  },
+  } as PageData,
 
   onLoad(options) {
     // 获取系统信息
@@ -94,15 +102,23 @@ Page({
       currentTab: options.from || "training", // 设置当前标签页
     });
 
-    // 获取学员ID
-    const studentId = parseInt(options.id || "1");
+    // 检查是否是新计划
+    const isNewPlan = options.isNew === "true";
 
-    // 加载数据
-    this.fetchStudentData(studentId);
-    this.fetchAIAnalysis(studentId);
-    this.fetchTrainingPlan(studentId);
-    this.fetchDietPlan(studentId);
-    this.fetchSupplements(studentId);
+    if (isNewPlan) {
+      // 如果是新计划，初始化空数据
+      this.initNewPlan();
+    } else {
+      // 获取学员ID
+      const studentId = parseInt(options.id || "1");
+
+      // 加载数据
+      this.fetchStudentData(studentId);
+      this.fetchAIAnalysis(studentId);
+      TrainingController.fetchTrainingPlan(studentId, this);
+      DietController.fetchDietPlan(studentId, this);
+      SupplementController.fetchSupplements(studentId, this);
+    }
   },
 
   // 获取学员数据
@@ -152,7 +168,7 @@ Page({
 
       // 实际应用中应该从服务器获取数据
       // const res = await request({
-      //   url: `/api/students/${studentId}/analysis`,
+      //   url: `/api/students/${studentId}/ai-analysis`,
       //   method: 'GET'
       // });
 
@@ -160,19 +176,19 @@ Page({
       setTimeout(() => {
         const aiAnalysis = {
           suggestions: [
-            "卧推进步迅速，可以增加5kg重量",
-            "深蹲技术需要改进，建议减少重量并优化姿势",
-            "背部肌群发展不均衡，建议增加下背部训练",
+            "增加深蹲训练强度，目前进步速度低于预期",
+            "考虑增加蛋白质摄入，建议达到每天2g/kg体重",
+            "睡眠质量不足，建议调整作息，确保每晚7-8小时高质量睡眠",
           ],
           weeks: 8,
-          tests: 4,
+          tests: 3,
         };
 
         this.setData({
           aiAnalysis,
           "loading.aiAnalysis": false,
         });
-      }, 800);
+      }, 1000);
     } catch (error) {
       console.error("获取AI分析失败", error);
       wx.showToast({
@@ -185,312 +201,27 @@ Page({
     }
   },
 
-  // 获取训练计划
-  async fetchTrainingPlan(studentId: number) {
-    try {
-      this.setData({
-        "loading.trainingDays": true,
-      });
-
-      // 实际应用中应该从服务器获取数据
-      // const res = await request({
-      //   url: `/api/students/${studentId}/training-plan`,
-      //   method: 'GET'
-      // });
-
-      // 模拟从服务器获取数据
-      setTimeout(() => {
-        const trainingDays = [
-          {
-            day: "周一",
-            focus: "胸部, 肩部",
-            exercises: [
-              {
-                name: "卧推",
-                sets: 5,
-                reps: "5次",
-                weight: "80kg",
-                highlight: "green",
-              },
-              {
-                name: "上斜哑铃卧推",
-                sets: 4,
-                reps: "8次",
-                weight: "25kg/只",
-              },
-              {
-                name: "肩上推举",
-                sets: 4,
-                reps: "8次",
-                weight: "40kg",
-              },
-            ],
-          },
-          {
-            day: "周二",
-            focus: "背部",
-            exercises: [
-              {
-                name: "硬拉",
-                sets: 5,
-                reps: "5次",
-                weight: "120kg",
-              },
-              {
-                name: "引体向上",
-                sets: 4,
-                reps: "最大次数",
-                weight: "每组至少8次",
-              },
-              {
-                name: "坐姿划船",
-                sets: 4,
-                reps: "10次",
-                weight: "60kg",
-                highlight: "orange",
-              },
-            ],
-          },
-          {
-            day: "周四",
-            focus: "腿部",
-            exercises: [
-              {
-                name: "深蹲",
-                sets: 5,
-                reps: "5次",
-                weight: "100kg",
-                highlight: "red",
-              },
-              {
-                name: "腿举",
-                sets: 4,
-                reps: "10次",
-                weight: "150kg",
-              },
-            ],
-          },
-        ];
-
-        this.setData({
-          trainingDays,
-          "loading.trainingDays": false,
-        });
-      }, 600);
-    } catch (error) {
-      console.error("获取训练计划失败", error);
-      wx.showToast({
-        title: "获取训练计划失败",
-        icon: "none",
-      });
-      this.setData({
-        "loading.trainingDays": false,
-      });
-    }
-  },
-
-  // 应用AI建议
-  applyAISuggestions() {
-    wx.showLoading({
-      title: "应用AI建议中...",
-      mask: true,
-    });
-
-    // 模拟API调用
-    setTimeout(() => {
-      wx.hideLoading();
-      wx.showToast({
-        title: "AI建议已应用",
-        icon: "success",
-      });
-
-      // 刷新训练计划
-      this.fetchTrainingPlan(this.data.student.id);
-    }, 1500);
-  },
-
   // 返回上一页
   goBack() {
-    // 根据来源页面返回
-    if (this.data.previousPage === "students") {
-      wx.redirectTo({ url: "/pages/students/students" });
-    } else {
-      wx.redirectTo({ url: "/pages/training/training" });
-    }
+    wx.navigateBack();
   },
 
   // 切换底部标签页
   switchTab(e: any) {
     const tab = e.currentTarget.dataset.tab;
-
-    if (tab === this.data.currentTab) return;
-
     this.setData({
       currentTab: tab,
     });
 
-    // 根据标签切换页面
-    if (tab === "assistant") {
-      wx.redirectTo({ url: "/pages/coachX/coachX" });
-    } else if (tab === "students") {
-      wx.redirectTo({ url: "/pages/students/students" });
-    } else if (tab === "training") {
-      wx.redirectTo({ url: "/pages/training/training" });
-    }
-  },
-
-  // 获取饮食计划数据
-  async fetchDietPlan(studentId: number) {
-    try {
-      // 实际应用中应该从服务器获取数据
-      // const res = await request({
-      //   url: `/api/students/${studentId}/diet-plan`,
-      //   method: 'GET'
-      // });
-
-      // 模拟从服务器获取数据
-      setTimeout(() => {
-        const dietPlan = {
-          calories: 3000,
-          protein: 180,
-          carbs: 350,
-          fat: 80,
-          meals: [
-            {
-              name: "早餐",
-              time: "7:00 - 8:00",
-              foods: [
-                { name: "全麦面包", amount: "2片" },
-                { name: "鸡蛋", amount: "3个" },
-                { name: "牛奶", amount: "250ml" },
-                { name: "香蕉", amount: "1个" },
-              ],
-            },
-            {
-              name: "上午加餐",
-              time: "10:30",
-              foods: [
-                { name: "希腊酸奶", amount: "200g" },
-                { name: "蓝莓", amount: "50g" },
-                { name: "杏仁", amount: "30g" },
-              ],
-            },
-            {
-              name: "午餐",
-              time: "12:30 - 13:30",
-              foods: [
-                { name: "糙米", amount: "150g" },
-                { name: "鸡胸肉", amount: "150g" },
-                { name: "西兰花", amount: "100g" },
-                { name: "橄榄油", amount: "1勺" },
-              ],
-            },
-            {
-              name: "训练前",
-              time: "训练前30分钟",
-              foods: [
-                { name: "香蕉", amount: "1个" },
-                { name: "蛋白棒", amount: "1条" },
-              ],
-            },
-            {
-              name: "训练后",
-              time: "训练后30分钟内",
-              foods: [
-                { name: "蛋白粉", amount: "30g" },
-                { name: "快速碳水", amount: "50g" },
-              ],
-            },
-            {
-              name: "晚餐",
-              time: "19:00 - 20:00",
-              foods: [
-                { name: "红薯", amount: "200g" },
-                { name: "三文鱼", amount: "150g" },
-                { name: "混合蔬菜", amount: "150g" },
-                { name: "橄榄油", amount: "1勺" },
-              ],
-            },
-          ],
-          notes:
-            "训练日增加碳水摄入，非训练日减少100g碳水。保持充分水分摄入，每天至少2.5升水。",
-        };
-
-        this.setData({
-          dietPlan,
-        });
-      }, 500);
-    } catch (error) {
-      console.error("获取饮食计划失败", error);
-      wx.showToast({
-        title: "获取饮食计划失败",
-        icon: "none",
+    // 根据标签页跳转到相应页面
+    if (tab !== this.data.previousPage) {
+      wx.redirectTo({
+        url: `../${tab}/${tab}`,
       });
     }
   },
 
-  // 获取补剂建议数据
-  async fetchSupplements(studentId: number) {
-    try {
-      // 实际应用中应该从服务器获取数据
-      // const res = await request({
-      //   url: `/api/students/${studentId}/supplements`,
-      //   method: 'GET'
-      // });
-
-      // 模拟从服务器获取数据
-      setTimeout(() => {
-        const supplements = [
-          {
-            name: "乳清蛋白",
-            dosage: "30g",
-            timing: "训练后和早餐",
-            purpose: "促进肌肉恢复和生长",
-          },
-          {
-            name: "肌酸",
-            dosage: "5g",
-            timing: "每天，训练日在训练前",
-            purpose: "增加力量和爆发力",
-          },
-          {
-            name: "BCAA",
-            dosage: "10g",
-            timing: "训练中",
-            purpose: "减少肌肉分解，促进恢复",
-          },
-          {
-            name: "鱼油",
-            dosage: "3g",
-            timing: "早餐和晚餐",
-            purpose: "减少炎症，促进关节健康",
-          },
-          {
-            name: "维生素D",
-            dosage: "2000IU",
-            timing: "早餐",
-            purpose: "支持免疫系统和骨骼健康",
-          },
-        ];
-
-        const supplementNotes =
-          "所有补剂都应在医生或营养师的指导下使用。补剂不能替代均衡饮食，只是作为补充。";
-
-        this.setData({
-          supplements,
-          supplementNotes,
-        });
-      }, 500);
-    } catch (error) {
-      console.error("获取补剂建议失败", error);
-      wx.showToast({
-        title: "获取补剂建议失败",
-        icon: "none",
-      });
-    }
-  },
-
-  // 切换标签页
+  // 切换计划标签页
   switchPlanTab(e: any) {
     const tab = e.currentTarget.dataset.tab;
     this.setData({
@@ -498,493 +229,606 @@ Page({
     });
   },
 
-  // 训练动作相关方法
-  // 添加训练动作
+  // 应用AI建议
+  applyAISuggestions() {
+    wx.showToast({
+      title: "已应用AI建议",
+      icon: "success",
+    });
+  },
+
+  // 训练相关方法
+  addTrainingDay() {
+    TrainingController.addTrainingDay(this);
+  },
+
+  editTrainingDay(e: any) {
+    TrainingController.editTrainingDay(this, e);
+  },
+
+  deleteTrainingDay(e: any) {
+    TrainingController.deleteTrainingDay(this, e);
+  },
+
   addExercise(e: any) {
-    const dayIndex = e.currentTarget.dataset.dayIndex;
-
-    wx.showModal({
-      title: "添加训练动作",
-      content: "请输入训练动作信息",
-      editable: true,
-      placeholderText: "例如：卧推 4组x10次 80kg",
-      success: (res) => {
-        if (res.confirm && res.content) {
-          // 解析输入内容
-          const parts = res.content.split(" ");
-          if (parts.length >= 3) {
-            const name = parts[0];
-            const setsReps = parts[1].split("x");
-            const sets = parseInt(setsReps[0]);
-            const reps = setsReps[1];
-            const weight = parts[2];
-
-            // 添加新动作
-            const trainingDays = [...this.data.trainingDays];
-            trainingDays[dayIndex].exercises.push({
-              name,
-              sets,
-              reps,
-              weight,
-            });
-
-            this.setData({
-              trainingDays,
-            });
-
-            wx.showToast({
-              title: "添加成功",
-              icon: "success",
-            });
-          } else {
-            wx.showToast({
-              title: "格式错误",
-              icon: "none",
-            });
-          }
-        }
-      },
-    });
+    TrainingController.addExercise(this, e);
   },
 
-  // 编辑训练动作
   editExercise(e: any) {
-    const dayIndex = e.currentTarget.dataset.dayIndex;
-    const exerciseIndex = e.currentTarget.dataset.exerciseIndex;
-    const exercise = this.data.trainingDays[dayIndex].exercises[exerciseIndex];
-
-    wx.showModal({
-      title: "编辑训练动作",
-      content: `${exercise.name} ${exercise.sets}组x${exercise.reps} ${exercise.weight}`,
-      editable: true,
-      success: (res) => {
-        if (res.confirm && res.content) {
-          // 解析输入内容
-          const parts = res.content.split(" ");
-          if (parts.length >= 3) {
-            const name = parts[0];
-            const setsReps = parts[1].split("x");
-            const sets = parseInt(setsReps[0]);
-            const reps = setsReps[1];
-            const weight = parts[2];
-
-            // 更新动作
-            const trainingDays = [...this.data.trainingDays];
-            trainingDays[dayIndex].exercises[exerciseIndex] = {
-              name,
-              sets,
-              reps,
-              weight,
-              highlight: exercise.highlight,
-            };
-
-            this.setData({
-              trainingDays,
-            });
-
-            wx.showToast({
-              title: "更新成功",
-              icon: "success",
-            });
-          } else {
-            wx.showToast({
-              title: "格式错误",
-              icon: "none",
-            });
-          }
-        }
-      },
-    });
+    TrainingController.editExercise(this, e);
   },
 
-  // 删除训练动作
   deleteExercise(e: any) {
-    const dayIndex = e.currentTarget.dataset.dayIndex;
-    const exerciseIndex = e.currentTarget.dataset.exerciseIndex;
-
-    wx.showModal({
-      title: "删除训练动作",
-      content: "确定要删除这个训练动作吗？",
-      success: (res) => {
-        if (res.confirm) {
-          // 删除动作
-          const trainingDays = [...this.data.trainingDays];
-          trainingDays[dayIndex].exercises.splice(exerciseIndex, 1);
-
-          this.setData({
-            trainingDays,
-          });
-
-          wx.showToast({
-            title: "删除成功",
-            icon: "success",
-          });
-        }
-      },
-    });
+    TrainingController.deleteExercise(this, e);
   },
 
-  // 饮食计划相关方法
-  // 编辑宏量营养素
+  // 饮食相关方法
   editMacros() {
-    wx.showModal({
-      title: "编辑宏量营养素",
-      content: `热量: ${this.data.dietPlan.calories}kcal, 蛋白质: ${this.data.dietPlan.protein}g, 碳水: ${this.data.dietPlan.carbs}g, 脂肪: ${this.data.dietPlan.fat}g`,
-      editable: true,
-      success: (res) => {
-        if (res.confirm && res.content) {
-          // 解析输入内容
-          const parts = res.content.split(", ");
-          if (parts.length >= 4) {
-            const calories = parseInt(parts[0].split(": ")[1]);
-            const protein = parseInt(parts[1].split(": ")[1]);
-            const carbs = parseInt(parts[2].split(": ")[1]);
-            const fat = parseInt(parts[3].split(": ")[1]);
-
-            // 更新宏量营养素
-            const dietPlan = { ...this.data.dietPlan };
-            dietPlan.calories = calories;
-            dietPlan.protein = protein;
-            dietPlan.carbs = carbs;
-            dietPlan.fat = fat;
-
-            this.setData({
-              dietPlan,
-            });
-
-            wx.showToast({
-              title: "更新成功",
-              icon: "success",
-            });
-          } else {
-            wx.showToast({
-              title: "格式错误",
-              icon: "none",
-            });
-          }
-        }
-      },
-    });
+    DietController.editMacros(this);
   },
 
-  // 添加餐次
   addMeal() {
-    wx.showModal({
-      title: "添加餐次",
-      content: "请输入餐次名称和时间",
-      editable: true,
-      placeholderText: "例如：加餐 15:00",
-      success: (res) => {
-        if (res.confirm && res.content) {
-          // 解析输入内容
-          const parts = res.content.split(" ");
-          if (parts.length >= 2) {
-            const name = parts[0];
-            const time = parts[1];
-
-            // 添加新餐次
-            const dietPlan = { ...this.data.dietPlan };
-            dietPlan.meals.push({
-              name,
-              time,
-              foods: [],
-            });
-
-            this.setData({
-              dietPlan,
-            });
-
-            wx.showToast({
-              title: "添加成功",
-              icon: "success",
-            });
-          } else {
-            wx.showToast({
-              title: "格式错误",
-              icon: "none",
-            });
-          }
-        }
-      },
-    });
+    DietController.addMeal(this);
   },
 
-  // 添加食物
   addFood(e: any) {
-    const mealIndex = e.currentTarget.dataset.mealIndex;
-
-    wx.showModal({
-      title: "添加食物",
-      content: "请输入食物名称和数量",
-      editable: true,
-      placeholderText: "例如：鸡胸肉 100g",
-      success: (res) => {
-        if (res.confirm && res.content) {
-          // 解析输入内容
-          const parts = res.content.split(" ");
-          if (parts.length >= 2) {
-            const name = parts[0];
-            const amount = parts[1];
-
-            // 添加新食物
-            const dietPlan = { ...this.data.dietPlan };
-            dietPlan.meals[mealIndex].foods.push({
-              name,
-              amount,
-            });
-
-            this.setData({
-              dietPlan,
-            });
-
-            wx.showToast({
-              title: "添加成功",
-              icon: "success",
-            });
-          } else {
-            wx.showToast({
-              title: "格式错误",
-              icon: "none",
-            });
-          }
-        }
-      },
-    });
+    DietController.addFood(this, e);
   },
 
-  // 编辑食物
   editFood(e: any) {
-    const mealIndex = e.currentTarget.dataset.mealIndex;
-    const foodIndex = e.currentTarget.dataset.foodIndex;
-    const food = this.data.dietPlan.meals[mealIndex].foods[foodIndex];
-
-    wx.showModal({
-      title: "编辑食物",
-      content: `${food.name} ${food.amount}`,
-      editable: true,
-      success: (res) => {
-        if (res.confirm && res.content) {
-          // 解析输入内容
-          const parts = res.content.split(" ");
-          if (parts.length >= 2) {
-            const name = parts[0];
-            const amount = parts[1];
-
-            // 更新食物
-            const dietPlan = { ...this.data.dietPlan };
-            dietPlan.meals[mealIndex].foods[foodIndex] = {
-              name,
-              amount,
-            };
-
-            this.setData({
-              dietPlan,
-            });
-
-            wx.showToast({
-              title: "更新成功",
-              icon: "success",
-            });
-          } else {
-            wx.showToast({
-              title: "格式错误",
-              icon: "none",
-            });
-          }
-        }
-      },
-    });
+    DietController.editFood(this, e);
   },
 
-  // 删除食物
   deleteFood(e: any) {
-    const mealIndex = e.currentTarget.dataset.mealIndex;
-    const foodIndex = e.currentTarget.dataset.foodIndex;
-
-    wx.showModal({
-      title: "删除食物",
-      content: "确定要删除这个食物吗？",
-      success: (res) => {
-        if (res.confirm) {
-          // 删除食物
-          const dietPlan = { ...this.data.dietPlan };
-          dietPlan.meals[mealIndex].foods.splice(foodIndex, 1);
-
-          this.setData({
-            dietPlan,
-          });
-
-          wx.showToast({
-            title: "删除成功",
-            icon: "success",
-          });
-        }
-      },
-    });
+    DietController.deleteFood(this, e);
   },
 
-  // 编辑饮食注意事项
   editDietNotes() {
-    wx.showModal({
-      title: "编辑饮食注意事项",
-      content: this.data.dietPlan.notes || "",
-      editable: true,
-      success: (res) => {
-        if (res.confirm) {
-          // 更新注意事项
-          const dietPlan = { ...this.data.dietPlan };
-          dietPlan.notes = res.content;
-
-          this.setData({
-            dietPlan,
-          });
-
-          wx.showToast({
-            title: "更新成功",
-            icon: "success",
-          });
-        }
-      },
-    });
+    DietController.editDietNotes(this);
   },
 
-  // 补剂建议相关方法
-  // 添加补剂
+  // 补剂相关方法
   addSupplement() {
-    wx.showModal({
-      title: "添加补剂",
-      content: "请输入补剂信息",
-      editable: true,
-      placeholderText: "例如：维生素C 1000mg 早餐 增强免疫力",
+    SupplementController.addSupplement(this);
+  },
+
+  editSupplement(e: any) {
+    SupplementController.editSupplement(this, e);
+  },
+
+  deleteSupplement(e: any) {
+    SupplementController.deleteSupplement(this, e);
+  },
+
+  editSupplementNotes() {
+    SupplementController.editSupplementNotes(this);
+  },
+
+  deleteMeal(e: any) {
+    DietController.deleteMeal(this, e);
+  },
+
+  quickAddMeal() {
+    DietController.quickAddMeal(this);
+  },
+
+  editSupplementDosage(e: any) {
+    SupplementController.editSupplementDosage(this, e);
+  },
+
+  // 保存计划
+  savePlan() {
+    wx.showLoading({
+      title: "保存中...",
+    });
+
+    // 准备要发送的数据 - 包含所有三个部分作为一个整体
+    const planData = {
+      studentId: this.data.student.id,
+      planName: this.data.student.planName,
+      planData: {
+        trainingDays: this.data.trainingDays,
+        dietPlan: this.data.dietPlan,
+        supplements: this.data.supplements,
+        supplementNotes: this.data.supplementNotes,
+      },
+    };
+
+    // 实际应用中应该发送到服务器
+    // request({
+    //   url: '/api/training-plans',
+    //   method: 'POST',
+    //   data: planData
+    // }).then(() => {
+    //   wx.hideLoading();
+    //   wx.showToast({
+    //     title: '保存成功',
+    //     icon: 'success'
+    //   });
+    // }).catch(error => {
+    //   console.error('保存计划失败', error);
+    //   wx.hideLoading();
+    //   wx.showToast({
+    //     title: '保存失败',
+    //     icon: 'none'
+    //   });
+    // });
+
+    // 模拟发送到服务器
+    setTimeout(() => {
+      wx.hideLoading();
+      wx.showToast({
+        title: "保存成功",
+        icon: "success",
+        duration: 2000,
+      });
+    }, 1500);
+  },
+
+  // 显示模板操作选项
+  showTemplateOptions() {
+    wx.showActionSheet({
+      itemList: ["保存为预设模板", "插入预设模板"],
       success: (res) => {
-        if (res.confirm && res.content) {
-          // 解析输入内容
-          const parts = res.content.split(" ");
-          if (parts.length >= 4) {
-            const name = parts[0];
-            const dosage = parts[1];
-            const timing = parts[2];
-            const purpose = parts.slice(3).join(" ");
-
-            // 添加新补剂
-            const supplements = [...this.data.supplements];
-            supplements.push({
-              name,
-              dosage,
-              timing,
-              purpose,
-            });
-
-            this.setData({
-              supplements,
-            });
-
-            wx.showToast({
-              title: "添加成功",
-              icon: "success",
-            });
-          } else {
-            wx.showToast({
-              title: "格式错误",
-              icon: "none",
-            });
-          }
+        if (res.tapIndex === 0) {
+          this.saveAsTemplate();
+        } else if (res.tapIndex === 1) {
+          this.insertTemplate();
         }
       },
     });
   },
 
-  // 编辑补剂
-  editSupplement(e: any) {
-    const supplementIndex = e.currentTarget.dataset.supplementIndex;
-    const supplement = this.data.supplements[supplementIndex];
-
+  // 保存为预设模板
+  saveAsTemplate() {
     wx.showModal({
-      title: "编辑补剂",
-      content: `${supplement.name} ${supplement.dosage} ${supplement.timing} ${supplement.purpose}`,
+      title: "保存为预设模板",
+      content: "请输入模板名称",
       editable: true,
+      placeholderText: "例如：初级增肌计划",
       success: (res) => {
         if (res.confirm && res.content) {
-          // 解析输入内容
-          const parts = res.content.split(" ");
-          if (parts.length >= 4) {
-            const name = parts[0];
-            const dosage = parts[1];
-            const timing = parts[2];
-            const purpose = parts.slice(3).join(" ");
+          const templateName = res.content.trim();
 
-            // 更新补剂
-            const supplements = [...this.data.supplements];
-            supplements[supplementIndex] = {
-              name,
-              dosage,
-              timing,
-              purpose,
+          if (templateName) {
+            wx.showLoading({
+              title: "保存中...",
+            });
+
+            // 准备要保存的模板数据 - 包含所有三个部分
+            const templateData = {
+              name: templateName,
+              description: `${this.data.student.name}的训练计划模板`,
+              category: this.data.student.phase.replace("期", ""),
+              level: "自定义",
+              duration: `${this.data.student.week}周`,
+              planData: {
+                trainingDays: this.data.trainingDays,
+                dietPlan: this.data.dietPlan,
+                supplements: this.data.supplements,
+                supplementNotes: this.data.supplementNotes,
+              },
             };
 
-            this.setData({
-              supplements,
-            });
+            // 实际应用中应该发送到服务器
+            // request({
+            //   url: '/api/templates',
+            //   method: 'POST',
+            //   data: templateData
+            // }).then(() => {
+            //   wx.hideLoading();
+            //   wx.showToast({
+            //     title: '模板保存成功',
+            //     icon: 'success'
+            //   });
+            // }).catch(error => {
+            //   console.error('保存模板失败', error);
+            //   wx.hideLoading();
+            //   wx.showToast({
+            //     title: '保存失败',
+            //     icon: 'none'
+            //   });
+            // });
 
-            wx.showToast({
-              title: "更新成功",
-              icon: "success",
-            });
-          } else {
-            wx.showToast({
-              title: "格式错误",
-              icon: "none",
-            });
+            // 模拟发送到服务器
+            setTimeout(() => {
+              wx.hideLoading();
+              wx.showToast({
+                title: "模板保存成功",
+                icon: "success",
+                duration: 2000,
+              });
+            }, 1000);
           }
         }
       },
     });
   },
 
-  // 删除补剂
-  deleteSupplement(e: any) {
-    const supplementIndex = e.currentTarget.dataset.supplementIndex;
+  // 插入预设模板
+  insertTemplate() {
+    wx.showLoading({
+      title: "加载模板...",
+    });
 
-    wx.showModal({
-      title: "删除补剂",
-      content: "确定要删除这个补剂吗？",
+    // 实际应用中应该从服务器获取模板列表
+    // request({
+    //   url: '/api/templates',
+    //   method: 'GET'
+    // }).then(res => {
+    //   const templates = res.data;
+    //   this.showTemplateList(templates);
+    // }).catch(error => {
+    //   console.error('获取模板列表失败', error);
+    //   wx.hideLoading();
+    //   wx.showToast({
+    //     title: '获取模板失败',
+    //     icon: 'none'
+    //   });
+    // });
+
+    // 模拟从服务器获取数据
+    setTimeout(() => {
+      wx.hideLoading();
+
+      // 模拟模板列表数据
+      const templates = [
+        {
+          id: 1,
+          name: "初级增肌计划",
+          description: "适合初学者的全身增肌训练计划",
+        },
+        {
+          id: 2,
+          name: "中级增肌计划",
+          description: "适合有一定基础的训练者，分化训练",
+        },
+        {
+          id: 3,
+          name: "高级增肌计划",
+          description: "高强度、高频率的增肌计划",
+        },
+        {
+          id: 4,
+          name: "减脂塑形计划",
+          description: "结合力量训练和有氧训练，帮助减脂塑形",
+        },
+        {
+          id: 5,
+          name: "功能性训练计划",
+          description: "提高整体运动能力和身体机能的训练计划",
+        },
+      ];
+
+      this.showTemplateList(templates);
+    }, 500);
+  },
+
+  // 显示模板列表
+  showTemplateList(templates: any[]) {
+    if (templates.length === 0) {
+      wx.showToast({
+        title: "暂无可用模板",
+        icon: "none",
+      });
+      return;
+    }
+
+    wx.showActionSheet({
+      itemList: templates.map((t) => t.name),
       success: (res) => {
-        if (res.confirm) {
-          // 删除补剂
-          const supplements = [...this.data.supplements];
-          supplements.splice(supplementIndex, 1);
+        const selectedTemplate = templates[res.tapIndex];
 
-          this.setData({
-            supplements,
-          });
+        wx.showModal({
+          title: "应用模板",
+          content: `确定要应用"${selectedTemplate.name}"模板吗？这将替换当前的所有计划内容。`,
+          success: (res) => {
+            if (res.confirm) {
+              wx.showLoading({
+                title: "应用模板中...",
+              });
 
-          wx.showToast({
-            title: "删除成功",
-            icon: "success",
-          });
-        }
+              // 模拟从服务器获取模板详情
+              setTimeout(() => {
+                // 获取模板数据
+                const templateData = this.getMockTemplateData(
+                  selectedTemplate.id
+                );
+
+                // 应用模板数据
+                this.applyTemplate(templateData);
+
+                // 隐藏加载提示并显示成功提示
+                wx.hideLoading();
+                wx.showToast({
+                  title: "模板应用成功",
+                  icon: "success",
+                  duration: 2000,
+                });
+              }, 500);
+            }
+          },
+        });
       },
     });
   },
 
-  // 编辑补剂注意事项
-  editSupplementNotes() {
-    wx.showModal({
-      title: "编辑补剂注意事项",
-      content: this.data.supplementNotes || "",
-      editable: true,
-      success: (res) => {
-        if (res.confirm) {
-          // 更新注意事项
-          this.setData({
-            supplementNotes: res.content,
-          });
+  // 获取当前模板数据
+  getTemplateData() {
+    // 返回完整的计划数据
+    return {
+      trainingDays: this.data.trainingDays,
+      dietPlan: this.data.dietPlan,
+      supplements: this.data.supplements,
+      supplementNotes: this.data.supplementNotes,
+    };
+  },
 
-          wx.showToast({
-            title: "更新成功",
-            icon: "success",
-          });
-        }
+  // 应用模板
+  applyTemplate(templateData: any) {
+    console.log("应用模板数据:", templateData);
+
+    // 根据模板ID的不同，应用不同类型的模板数据
+    if (templateData.length > 0) {
+      // 如果是训练计划模板（数组格式）
+      this.setData({
+        trainingDays: templateData,
+      });
+    } else if (templateData.calories !== undefined) {
+      // 如果是饮食计划模板
+      this.setData({
+        dietPlan: templateData,
+      });
+    } else if (templateData.supplements !== undefined) {
+      // 如果是补剂建议模板
+      this.setData({
+        supplements: templateData.supplements,
+        supplementNotes: templateData.notes || "",
+      });
+    } else if (templateData.planData) {
+      // 如果是完整的计划数据
+      this.setData({
+        trainingDays: templateData.planData.trainingDays || [],
+        dietPlan: templateData.planData.dietPlan || {
+          calories: 0,
+          protein: 0,
+          carbs: 0,
+          fat: 0,
+          meals: [],
+        },
+        supplements: templateData.planData.supplements || [],
+        supplementNotes: templateData.planData.supplementNotes || "",
+      });
+    }
+  },
+
+  // 获取标签页名称
+  getTabName() {
+    switch (this.data.activeTab) {
+      case "training":
+        return "训练计划";
+      case "diet":
+        return "饮食计划";
+      case "supplements":
+        return "补剂建议";
+      default:
+        return "";
+    }
+  },
+
+  // 模拟获取模板数据（实际应用中应该从服务器获取）
+  getMockTemplateData(templateId: number) {
+    // 这里只是示例数据，实际应用中应该从服务器获取
+    const mockTemplates: any = {
+      // 训练计划模板
+      1: {
+        planData: {
+          trainingDays: [
+            {
+              day: "周一",
+              focus: "胸部/肩部",
+              exercises: [
+                {
+                  name: "平板杠铃卧推",
+                  sets: [
+                    { weight: "60kg", reps: "12次" },
+                    { weight: "70kg", reps: "10次" },
+                    { weight: "80kg", reps: "8次" },
+                    { weight: "85kg", reps: "6次" },
+                  ],
+                  note: "注意肩膀下沉，胸部挺起",
+                },
+                {
+                  name: "上斜哑铃卧推",
+                  sets: [
+                    { weight: "22kg", reps: "12次" },
+                    { weight: "24kg", reps: "10次" },
+                    { weight: "26kg", reps: "8次" },
+                  ],
+                },
+                {
+                  name: "坐姿哑铃肩推",
+                  sets: [
+                    { weight: "18kg", reps: "12次" },
+                    { weight: "20kg", reps: "10次" },
+                    { weight: "22kg", reps: "8次" },
+                  ],
+                },
+              ],
+            },
+            {
+              day: "周三",
+              focus: "背部/二头肌",
+              exercises: [
+                {
+                  name: "引体向上",
+                  sets: [
+                    { weight: "体重", reps: "10次" },
+                    { weight: "体重", reps: "8次" },
+                    { weight: "体重", reps: "6次" },
+                  ],
+                },
+                {
+                  name: "坐姿划船",
+                  sets: [
+                    { weight: "60kg", reps: "12次" },
+                    { weight: "70kg", reps: "10次" },
+                    { weight: "80kg", reps: "8次" },
+                  ],
+                },
+              ],
+            },
+            {
+              day: "周五",
+              focus: "腿部/三头肌",
+              exercises: [
+                {
+                  name: "杠铃深蹲",
+                  sets: [
+                    { weight: "80kg", reps: "12次" },
+                    { weight: "90kg", reps: "10次" },
+                    { weight: "100kg", reps: "8次" },
+                    { weight: "110kg", reps: "6次" },
+                  ],
+                  note: "注意膝盖不要超过脚尖",
+                },
+                {
+                  name: "腿举",
+                  sets: [
+                    { weight: "120kg", reps: "12次" },
+                    { weight: "140kg", reps: "10次" },
+                    { weight: "160kg", reps: "8次" },
+                  ],
+                },
+              ],
+            },
+          ],
+          dietPlan: {
+            calories: 2200,
+            protein: 180,
+            carbs: 220,
+            fat: 60,
+            meals: [
+              {
+                name: "早餐",
+                time: "",
+                foods: [
+                  { name: "全麦面包", amount: "2片" },
+                  { name: "鸡蛋", amount: "3个" },
+                  { name: "牛奶", amount: "250ml" },
+                ],
+              },
+              {
+                name: "午餐",
+                time: "",
+                foods: [
+                  { name: "糙米", amount: "100g" },
+                  { name: "鸡胸肉", amount: "150g" },
+                  { name: "西兰花", amount: "100g" },
+                  { name: "橄榄油", amount: "1茶匙" },
+                ],
+              },
+              {
+                name: "晚餐",
+                time: "",
+                foods: [
+                  { name: "红薯", amount: "150g" },
+                  { name: "三文鱼", amount: "150g" },
+                  { name: "混合蔬菜", amount: "200g" },
+                ],
+              },
+            ],
+            notes: "每天饮水至少2升，避免加工食品和精制糖。",
+          },
+          supplements: [
+            {
+              name: "乳清蛋白",
+              dosage: "30g",
+              morning: "",
+              noon: "",
+              evening: "1勺",
+            },
+            {
+              name: "肌酸",
+              dosage: "5g",
+              morning: "5g",
+              noon: "",
+              evening: "",
+            },
+            {
+              name: "鱼油",
+              dosage: "1000mg",
+              morning: "1粒",
+              noon: "",
+              evening: "1粒",
+            },
+            {
+              name: "维生素D",
+              dosage: "2000IU",
+              morning: "1粒",
+              noon: "",
+              evening: "",
+            },
+          ],
+          supplementNotes:
+            "乳清蛋白在训练后30分钟内服用，肌酸每天保持摄入，不需要周期性使用。",
+        },
+      },
+
+      // 其他模板...
+      2: {
+        planData: {
+          // 中级增肌计划数据...
+          trainingDays: [
+            // 训练日数据...
+          ],
+          dietPlan: {
+            // 饮食计划数据...
+          },
+          supplements: [
+            // 补剂数据...
+          ],
+          supplementNotes: "补剂说明...",
+        },
+      },
+
+      // 更多模板...
+    };
+
+    return mockTemplates[templateId] || {};
+  },
+
+  // 初始化新计划
+  initNewPlan() {
+    // 设置一个空的计划数据
+    this.setData({
+      student: {
+        id: 0,
+        name: "新计划",
+        avatar: "新",
+        avatarStyle: "background-color: #1890ff; color: white;",
+        phase: "自定义",
+        phaseTagClass: "tag-custom",
+        week: 1,
+        planName: "未命名计划",
+        height: 0,
+        weight: 0,
+        weightChange: 0,
+      },
+      aiAnalysis: null, // 不显示AI分析
+      trainingDays: [], // 空的训练计划
+      dietPlan: {
+        calories: 0,
+        protein: 0,
+        carbs: 0,
+        fat: 0,
+        meals: [],
+      },
+      supplements: [], // 空的补剂建议
+      supplementNotes: "",
+      loading: {
+        aiAnalysis: false,
+        trainingDays: false,
       },
     });
   },

@@ -413,4 +413,33 @@ Page({
       path: "/pages/coachX/coachX",
     };
   },
+
+  // 显示学员操作选项
+  showStudentOptions(e: any) {
+    const studentId = e.currentTarget.dataset.studentId;
+
+    wx.showActionSheet({
+      itemList: ["查看今日训练", "编辑训练计划", "删除学员"],
+      success: (res) => {
+        switch (res.tapIndex) {
+          case 0:
+            // 查看今日训练
+            wx.navigateTo({
+              url: `../todayTraining/todayTraining?id=${studentId}`,
+            });
+            break;
+          case 1:
+            // 编辑训练计划
+            wx.navigateTo({
+              url: `../planDetail/planDetail?id=${studentId}&from=students`,
+            });
+            break;
+          case 2:
+            // 删除学员
+            this.deleteStudent(studentId);
+            break;
+        }
+      },
+    });
+  },
 });

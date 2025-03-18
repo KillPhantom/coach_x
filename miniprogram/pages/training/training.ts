@@ -4,12 +4,13 @@ import { request } from "../../utils/request";
 interface Template {
   id: number;
   name: string;
-  frequency: string;
-  usageCount: number;
-  optimized: boolean;
+  description: string;
+  category: string;
+  level: string;
+  duration: string;
 }
 
-interface StudentPlan {
+interface Student {
   id: number;
   name: string;
   avatar: string;
@@ -18,6 +19,9 @@ interface StudentPlan {
   phaseTagClass: string;
   week: number;
   planName: string;
+  height: number;
+  weight: number;
+  weightChange: number;
 }
 
 interface AIInsight {
@@ -28,17 +32,18 @@ Page({
   data: {
     statusBarHeight: 0,
     currentTab: "training",
+    activeSection: "templates", // 'templates' 或 'students'
     filterOptions: ["所有计划", "增肌计划", "减脂计划", "力量计划"],
     filterIndex: 0,
     searchText: "",
     templates: [] as Template[],
-    studentPlans: [] as StudentPlan[],
+    students: [] as Student[],
     aiInsight: {
       text: "加载中...",
     } as AIInsight,
     loading: {
       templates: true,
-      studentPlans: true,
+      students: true,
       aiInsight: true,
     },
   },
@@ -51,18 +56,19 @@ Page({
     // 设置标题栏高度
     this.setData({
       statusBarHeight: statusBarHeight,
+      currentTab: "training",
     });
 
     // 加载数据
     this.fetchTemplates();
-    this.fetchStudentPlans();
+    this.fetchStudents();
     this.fetchAIInsight();
   },
 
   onShow() {
     // 页面显示时刷新数据
     this.fetchTemplates();
-    this.fetchStudentPlans();
+    this.fetchStudents();
   },
 
   // 获取模板数据
@@ -84,30 +90,42 @@ Page({
           {
             id: 1,
             name: "初级增肌计划",
-            frequency: "3天训练/周",
-            usageCount: 5,
-            optimized: true,
+            description: "适合初学者的全身增肌训练计划，每周3次训练",
+            category: "增肌",
+            level: "初级",
+            duration: "8周",
           },
           {
             id: 2,
             name: "中级增肌计划",
-            frequency: "4天训练/周",
-            usageCount: 3,
-            optimized: true,
+            description: "适合有一定基础的训练者，分化训练，每周4次",
+            category: "增肌",
+            level: "中级",
+            duration: "12周",
           },
           {
             id: 3,
-            name: "高强度减脂计划",
-            frequency: "5天训练/周",
-            usageCount: 4,
-            optimized: false,
+            name: "高级增肌计划",
+            description: "高强度、高频率的增肌计划，适合有经验的训练者",
+            category: "增肌",
+            level: "高级",
+            duration: "16周",
           },
           {
             id: 4,
-            name: "力量训练计划",
-            frequency: "4天训练/周",
-            usageCount: 2,
-            optimized: false,
+            name: "减脂塑形计划",
+            description: "结合力量训练和有氧训练，帮助减脂塑形",
+            category: "减脂",
+            level: "中级",
+            duration: "8周",
+          },
+          {
+            id: 5,
+            name: "功能性训练计划",
+            description: "提高整体运动能力和身体机能的训练计划",
+            category: "功能性",
+            level: "全级别",
+            duration: "6周",
           },
         ];
 
@@ -128,67 +146,102 @@ Page({
     }
   },
 
-  // 获取学员计划数据
-  async fetchStudentPlans() {
+  // 获取学员数据
+  async fetchStudents() {
     try {
       this.setData({
-        "loading.studentPlans": true,
+        "loading.students": true,
       });
 
       // 实际应用中应该从服务器获取数据
       // const res = await request({
-      //   url: '/api/student-plans',
+      //   url: '/api/students',
       //   method: 'GET'
       // });
 
       // 模拟从服务器获取数据
       setTimeout(() => {
-        const studentPlans = [
+        const students = [
           {
             id: 1,
             name: "张三",
             avatar: "张",
-            avatarStyle: "",
+            avatarStyle: "background-color: #1890ff; color: white;",
             phase: "增肌期",
             phaseTagClass: "tag-bulking",
             week: 8,
             planName: "初级增肌计划",
+            height: 178,
+            weight: 75.5,
+            weightChange: 0.8,
           },
           {
             id: 2,
-            name: "王五",
-            avatar: "王",
-            avatarStyle: "",
-            phase: "维持期",
-            phaseTagClass: "tag-maintenance",
-            week: 12,
-            planName: "中级增肌计划",
+            name: "李四",
+            avatar: "李",
+            avatarStyle: "background-color: #52c41a; color: white;",
+            phase: "减脂期",
+            phaseTagClass: "tag-cutting",
+            week: 4,
+            planName: "减脂塑形计划",
+            height: 175,
+            weight: 80.2,
+            weightChange: -1.2,
           },
           {
             id: 3,
+            name: "王五",
+            avatar: "王",
+            avatarStyle: "background-color: #722ed1; color: white;",
+            phase: "维持期",
+            phaseTagClass: "tag-maintaining",
+            week: 12,
+            planName: "功能性训练计划",
+            height: 182,
+            weight: 78.0,
+            weightChange: 0.0,
+          },
+          {
+            id: 4,
+            name: "赵六",
+            avatar: "赵",
+            avatarStyle: "background-color: #fa8c16; color: white;",
+            phase: "增肌期",
+            phaseTagClass: "tag-bulking",
+            week: 6,
+            planName: "中级增肌计划",
+            height: 180,
+            weight: 82.5,
+            weightChange: 0.5,
+          },
+          {
+            id: 5,
             name: "钱七",
             avatar: "钱",
-            avatarStyle: "background: #FFEBEE; color: #F44336;",
+            avatarStyle: "background-color: #eb2f96; color: white;",
             phase: "减脂期",
             phaseTagClass: "tag-cutting",
             week: 2,
-            planName: "高强度减脂计划",
+            planName: "减脂塑形计划",
+            height: 168,
+            weight: 65.8,
+            weightChange: -0.7,
           },
         ];
 
         this.setData({
-          studentPlans,
-          "loading.studentPlans": false,
+          students,
+          "loading.students": false,
         });
       }, 500);
     } catch (error) {
-      console.error("获取学员计划数据失败", error);
+      console.error("获取学员数据失败", error);
       wx.showToast({
-        title: "获取学员计划数据失败",
+        title: "获取学员数据失败",
         icon: "none",
       });
       this.setData({
-        "loading.studentPlans": false,
+        "loading.students": false,
       });
     }
   },
@@ -251,7 +304,7 @@ Page({
     // }).then(res => {
     //   this.setData({
     //     templates: res.data.templates,
-    //     studentPlans: res.data.studentPlans
+    //     students: res.data.students
     //   });
     // });
 
@@ -299,56 +352,43 @@ Page({
     // });
   },
 
-  // 编辑计划
+  // 编辑训练计划
   editPlan(e: any) {
-    const planId = e.currentTarget.dataset.planId;
-    const plan = this.data.studentPlans.find((p) => p.id === planId);
+    const studentId = e.currentTarget.dataset.planId;
 
-    if (plan) {
-      wx.showToast({
-        title: `编辑${plan.name}的${plan.planName}`,
-        icon: "none",
-      });
-
-      // 实际应用中可以跳转到计划编辑页
-      // wx.navigateTo({
-      //   url: `/pages/editPlan/editPlan?id=${planId}`
-      // });
-    }
+    // 直接跳转到计划详情页面
+    wx.navigateTo({
+      url: `../planDetail/planDetail?id=${studentId}&from=training`,
+    });
   },
 
-  // 批量优化计划
-  batchOptimize() {
-    wx.showToast({
-      title: "批量AI优化计划",
-      icon: "none",
+  // 应用训练计划
+  applyPlan(e: any) {
+    const templateId = e.currentTarget.dataset.templateId;
+    const templateName =
+      this.data.templates.find((t) => t.id === templateId)?.name || "";
+
+    // 显示学员选择列表
+    wx.showActionSheet({
+      itemList: this.data.students.map((student) => student.name),
+      success: (res) => {
+        const studentId = this.data.students[res.tapIndex].id;
+        const studentName = this.data.students[res.tapIndex].name;
+
+        wx.showModal({
+          title: "应用训练计划",
+          content: `确定要将"${templateName}"应用到${studentName}的训练计划中吗？`,
+          success: (res) => {
+            if (res.confirm) {
+              wx.showToast({
+                title: "应用成功",
+                icon: "success",
+              });
+            }
+          },
+        });
+      },
     });
-
-    // 实际应用中可以调用API进行批量优化
-    // request({
-    //   url: '/api/batch-optimize',
-    //   method: 'POST'
-    // }).then(res => {
-    //   wx.showToast({
-    //     title: '优化成功',
-    //     icon: 'success'
-    //   });
-    //   this.fetchTemplates();
-    //   this.fetchStudentPlans();
-    // });
-  },
-
-  // 创建新计划
-  createNewPlan() {
-    wx.showToast({
-      title: "创建新计划",
-      icon: "none",
-    });
-
-    // 实际应用中可以跳转到创建计划页面
-    // wx.navigateTo({
-    //   url: '/pages/createPlan/createPlan'
-    // });
   },
 
   // 切换底部标签页
@@ -447,13 +487,24 @@ Page({
     }, 1500);
   },
 
-  // 查看学员计划详情
-  viewStudentPlan(e: any) {
-    const studentId = e.currentTarget.dataset.studentId;
+  // 切换训练计划部分
+  switchSection(e: any) {
+    const section = e.currentTarget.dataset.section;
+    this.setData({
+      activeSection: section,
+    });
 
-    // 跳转到计划详情页面
+    // 如果切换到学员部分且尚未加载数据，则加载学员数据
+    if (section === "students" && this.data.students.length === 0) {
+      this.fetchStudents();
+    }
+  },
+
+  // 创建新计划
+  createNewPlan() {
+    // 直接跳转到计划详情页面，但传递特殊参数表示是新计划
     wx.navigateTo({
-      url: `/pages/planDetail/planDetail?id=${studentId}&from=training`,
+      url: `../planDetail/planDetail?isNew=true&from=training`,
     });
   },
 });

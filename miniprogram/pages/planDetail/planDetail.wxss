@@ -139,12 +139,46 @@
 .workout-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
-.workout-target {
+.workout-name {
+  font-weight: bold;
+}
+
+.workout-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.workout-sets {
+  margin-bottom: 8px;
+}
+
+.workout-set {
+  padding: 4px 0;
+  color: #333;
+}
+
+.workout-note {
+  background-color: #f0f9f0;
+  border-radius: 4px;
+  padding: 8px;
+  margin-top: 8px;
+  border-left: 3px solid #07C160;
+}
+
+.note-title {
+  font-weight: bold;
   font-size: 12px;
-  color: #666;
+  margin-bottom: 4px;
+  color: #07C160;
+}
+
+.note-content {
+  font-size: 12px;
+  color: #333;
+  line-height: 1.4;
 }
 
 .diet-section {
@@ -163,35 +197,32 @@
 .action-buttons {
   display: flex;
   gap: 12px;
-  margin-top: 16px;
-  margin-bottom: 8px;
+  margin-top: 20px;
 }
 
 .button {
   flex: 1;
-  padding: 10px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 0;
   border-radius: 8px;
-  text-align: center;
   font-size: 14px;
-}
-
-.button-outline {
-  background-color: white;
-  border: 1px solid #ddd;
-  color: #333;
 }
 
 .button-primary {
   background-color: #07C160;
   color: white;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+}
+
+.button-outline {
+  background-color: white;
+  color: #07C160;
+  border: 1px solid #07C160;
 }
 
 .button-icon {
-  margin-right: 4px;
+  margin-right: 6px;
 }
 
 /* 加载状态样式 */
@@ -343,15 +374,30 @@
 .meal-item {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.meal-item-content {
+  display: flex;
+  flex: 1;
+  margin-right: 16px;
 }
 
 .meal-item-name {
-  flex: 1;
+  font-weight: 500;
+  margin-right: 8px;
 }
 
 .meal-item-amount {
   color: #666;
+}
+
+.item-actions {
+  display: flex;
+  gap: 12px;
+  white-space: nowrap;
 }
 
 .diet-notes {
@@ -417,14 +463,6 @@
 }
 
 /* 编辑按钮样式 */
-.item-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 8px;
-  font-size: 12px;
-}
-
 .edit-btn {
   color: #07C160;
 }
@@ -464,4 +502,61 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 8px;
+}
+
+/* 添加训练日按钮 */
+.add-training-day {
+  text-align: center;
+  padding: 12px;
+  color: #07C160;
+  font-size: 14px;
+  background-color: white;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 补剂表格样式 */
+.supplement-table {
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  background-color: white;
+  border: 1px solid #eee;
+}
+
+.supplement-table-header {
+  display: flex;
+  background-color: #f5f5f5;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 10px 0;
+}
+
+.supplement-table-row {
+  display: flex;
+  border-top: 1px solid #eee;
+  padding: 10px 0;
+}
+
+.supplement-name-header, .supplement-name-cell {
+  flex: 2;
+  padding: 0 10px;
+}
+
+.supplement-time-header, .supplement-time-cell {
+  flex: 1;
+  text-align: center;
+}
+
+.supplement-time-cell {
+  color: #07C160;
+  cursor: pointer;
+}
+
+.supplement-action-header, .supplement-action-cell {
+  flex: 1.5;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
 } 

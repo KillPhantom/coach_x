@@ -60,9 +60,7 @@
     <block wx:else>
       <view class="student-card" 
             wx:for="{{students}}" 
-            wx:key="id" 
-            bindtap="viewStudentDetail" 
-            data-student-id="{{item.id}}">
+            wx:key="id">
         <view class="avatar" style="{{item.avatarStyle}}">{{item.avatar}}</view>
         <view class="student-info">
           <view class="student-name">{{item.name}}</view>
@@ -71,8 +69,8 @@
             <text class="tag {{item.tagClass}}">{{item.tag}}</text>
           </view>
         </view>
-        <view class="student-action">
-          <button class="view-student-btn" catchtap="viewStudentDetail" data-student-id="{{item.id}}">查看</button>
+        <view class="student-actions">
+          <text class="action-btn" bindtap="showStudentOptions" data-student-id="{{item.id}}">操作</text>
         </view>
       </view>
       
