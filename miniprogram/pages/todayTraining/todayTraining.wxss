@@ -1,0 +1,612 @@
+/* 学生训练详情页面样式 */
+.header {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  background-color: #07C160;
+  color: white;
+  border-bottom: 1px solid #07C160;
+  padding: 0 15px;
+  font-size: 18px;
+  font-weight: 500;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  justify-content: center;
+}
+
+.back-button {
+  font-size: 24px;
+  margin-right: 10px;
+  line-height: 1;
+  color: white;
+  position: absolute;
+  left: 15px;
+}
+
+.container {
+  padding-top: 100px;
+}
+
+.container-with-tabs {
+  padding-bottom: 0;
+}
+
+.content-wrapper {
+  padding: 15px;
+}
+
+/* 学员信息样式 */
+.student-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  background-color: #1890ff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+.student-info {
+  flex: 1;
+}
+
+.student-name {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.student-tags {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-right: 5px;
+  background-color: #f0f0f0;
+}
+
+.tag-bulking {
+  background-color: #e6f7ff;
+  color: #1890ff;
+}
+
+.tag-cutting {
+  background-color: #fff2e8;
+  color: #fa541c;
+}
+
+.tag-maintenance {
+  background-color: #f6ffed;
+  color: #52c41a;
+}
+
+/* 日期选择器样式 */
+.date-selector {
+  margin-bottom: 15px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.date-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.date-arrow {
+  font-size: 16px;
+  color: #1890ff;
+  padding: 5px 10px;
+}
+
+.selected-date {
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  flex: 1;
+}
+
+/* 完成情况概览样式 */
+.completion-overview {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.completion-item {
+  flex: 1;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 10px;
+  margin: 0 5px;
+  display: flex;
+  align-items: center;
+}
+
+.completion-item:first-child {
+  margin-left: 0;
+}
+
+.completion-item:last-child {
+  margin-right: 0;
+}
+
+.completion-item.completed {
+  background-color: #f6ffed;
+}
+
+.completion-item.partial {
+  background-color: #fff7e6;
+}
+
+.completion-item.incomplete {
+  background-color: #fff1f0;
+}
+
+.completion-icon {
+  font-size: 20px;
+  margin-right: 5px;
+}
+
+.completion-info {
+  flex: 1;
+}
+
+.completion-title {
+  font-size: 12px;
+  color: #666;
+}
+
+.completion-status {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.completed .completion-status {
+  color: #52c41a;
+}
+
+.partial .completion-status {
+  color: #fa8c16;
+}
+
+.incomplete .completion-status {
+  color: #f5222d;
+}
+
+/* 标签页样式 */
+.plan-tabs {
+  display: flex;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 15px;
+}
+
+.plan-tab {
+  flex: 1;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 14px;
+  color: #666;
+  position: relative;
+}
+
+.plan-tab.active {
+  color: #1890ff;
+  font-weight: 500;
+}
+
+.plan-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 25%;
+  width: 50%;
+  height: 2px;
+  background-color: #1890ff;
+}
+
+/* 训练动作内容样式 */
+.tab-content {
+  margin-bottom: 20px;
+}
+
+.plan-day {
+  margin-bottom: 15px;
+}
+
+.day-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.workout-item {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.workout-item.completed {
+  background-color: #f6ffed;
+  border-left: 3px solid #52c41a;
+}
+
+.workout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.workout-name {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.workout-completion {
+  font-size: 12px;
+}
+
+.completed-text {
+  color: #52c41a;
+  font-size: 14px;
+}
+
+.incomplete-text {
+  color: #f5222d;
+  font-size: 14px;
+}
+
+.workout-sets {
+  margin-bottom: 8px;
+}
+
+.set-item {
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px dashed #eee;
+}
+
+.set-item:last-child {
+  border-bottom: none;
+}
+
+.set-number {
+  width: 50px;
+  font-size: 14px;
+  color: #666;
+}
+
+.set-weight {
+  flex: 1;
+  font-size: 14px;
+}
+
+.set-reps {
+  width: 60px;
+  font-size: 14px;
+  text-align: right;
+}
+
+.set-completion {
+  width: 30px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.set-completion.completed {
+  color: #52c41a;
+}
+
+.set-completion.incomplete {
+  color: #f5222d;
+}
+
+.workout-note, .workout-feedback {
+  font-size: 12px;
+  color: #666;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #eee;
+}
+
+.note-label, .feedback-label {
+  color: #999;
+  margin-right: 5px;
+}
+
+.no-training {
+  text-align: center;
+  padding: 30px 0;
+}
+
+.no-training-text {
+  color: #999;
+  font-size: 14px;
+}
+
+/* 饮食计划内容样式 */
+.diet-macros {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.macro-item {
+  flex: 1;
+  text-align: center;
+}
+
+.macro-value {
+  font-size: 16px;
+  font-weight: 500;
+  color: #1890ff;
+}
+
+.macro-label {
+  font-size: 12px;
+  color: #666;
+}
+
+.meal-container {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.meal-container.completed {
+  background-color: #f6ffed;
+  border-left: 3px solid #52c41a;
+}
+
+.meal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.meal-title {
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.meal-time {
+  font-size: 12px;
+  color: #666;
+  margin-left: 5px;
+}
+
+.meal-completion {
+  font-size: 12px;
+}
+
+.meal-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px dashed #eee;
+}
+
+.meal-item:last-child {
+  border-bottom: none;
+}
+
+.meal-item-content {
+  display: flex;
+  align-items: center;
+}
+
+.meal-item-name {
+  font-size: 14px;
+  margin-right: 10px;
+}
+
+.meal-item-amount {
+  font-size: 12px;
+  color: #666;
+}
+
+.food-completion {
+  width: 30px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.food-completion.completed {
+  color: #52c41a;
+}
+
+.food-completion.incomplete {
+  color: #f5222d;
+}
+
+.diet-notes {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 15px;
+}
+
+.diet-notes-header {
+  margin-bottom: 8px;
+}
+
+.diet-notes-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.diet-notes-content {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* 补剂建议内容样式 - 类似饮食计划 */
+.supplement-container {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.supplement-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.supplement-title {
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.supplement-completion {
+  font-size: 12px;
+}
+
+.supplement-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px dashed #eee;
+}
+
+.supplement-item:last-child {
+  border-bottom: none;
+}
+
+.supplement-item-content {
+  display: flex;
+  align-items: center;
+}
+
+.supplement-item-name {
+  font-size: 14px;
+  margin-right: 10px;
+}
+
+.supplement-item-amount {
+  font-size: 12px;
+  color: #666;
+}
+
+.supplement-item-status {
+  font-size: 12px;
+}
+
+/* 操作按钮样式 */
+.action-buttons {
+  display: flex;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.button {
+  flex: 1;
+  height: 40px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  margin: 0 5px;
+}
+
+.button:first-child {
+  margin-left: 0;
+}
+
+.button:last-child {
+  margin-right: 0;
+}
+
+.button-primary {
+  background-color: #1890ff;
+  color: white;
+}
+
+.button-outline {
+  background-color: white;
+  color: #1890ff;
+  border: 1px solid #1890ff;
+}
+
+.button-icon {
+  margin-right: 5px;
+}
+
+/* 补剂列表样式 */
+.supplement-list {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.5;
+}
+
+.supplement-list view {
+  margin-bottom: 5px;
+}
+
+.supplement-list view:last-child {
+  margin-bottom: 0;
+}
+
+/* 水平排列的宏量营养素样式 */
+.macro-nutrients-horizontal {
+  display: flex;
+  justify-content: space-between;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.macro-nutrients-horizontal .macro-item {
+  text-align: center;
+}
+
+.macro-nutrients-horizontal .macro-value {
+  font-size: 18px;
+  font-weight: 500;
+  color: #1890ff;
+}
+
+.macro-nutrients-horizontal .macro-label {
+  font-size: 12px;
+  color: #666;
+  margin-top: 5px;
+} 

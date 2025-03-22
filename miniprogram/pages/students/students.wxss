@@ -36,6 +36,7 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
+  margin-top: 20px;
   padding: 0 12px;
 }
 
@@ -204,4 +205,53 @@
 .student-scroll-view {
   flex: 1;
   width: 100%;
+}
+
+/* 搜索容器样式 */
+.search-container {
+  display: flex;
+  padding: 10px 15px;
+  background-color: white;
+  border-bottom: 1px solid #eee;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.search-input {
+  flex: 0.7; /* 输入框占据80%宽度 */
+  height: 36px;
+  border: 1px solid #ddd;
+  border-radius: 18px;
+  padding: 0 15px;
+  font-size: 14px;
+  background-color: #f5f5f5;
+  box-sizing: border-box;
+  margin-right: 10px; /* 添加右边距 */
+}
+
+.search-button {
+  flex: 0.3; /* 按钮占据20%宽度 */
+  height: 36px;
+  line-height: 36px;
+  padding: 0;
+  font-size: 14px;
+  background-color: #07c160;
+  color: white;
+  border-radius: 18px;
+  text-align: center;
+  box-sizing: border-box;
 } 
+
+.student-actions{
+  background-color: #07C160;
+  border-radius: 18px;
+  color: white;
+  font-size: 12px;
+  padding: 10px 4px;
+}
+.action-btn{
+  width: 100%;
+  border-radius: 18px;
+  text-align: center;
+}

@@ -1,0 +1,326 @@
+/* 导入公共样式 */
+@import "../../styles/app.wxss";
+
+/* 页面特定样式 */
+.header {
+  display: flex;
+  align-items: center;
+  height: 80px;
+  background-color: white;
+  border-bottom: 1px solid #eee;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  box-sizing: border-box;
+  padding-top: 100px;
+}
+
+.back-button {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  z-index: 101;
+}
+
+.back-icon {
+  font-size: 20px;
+  color: #333;
+}
+
+.header-title {
+  flex: 1;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  color: black;
+}
+
+.header-right {
+  width: 44px;
+}
+
+.container {
+  padding-top: 120px;
+  padding-bottom: 20px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 0;
+}
+
+/* 学员信息卡片 */
+.student-card {
+  margin: 12px;
+  margin-top: -30px;
+  padding: 16px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  width: calc(100% - 24px);
+  box-sizing: border-box;
+  position: relative;
+  z-index: 10;
+}
+
+.student-info-header {
+  display: flex;
+  align-items: center;
+}
+
+.avatar-container {
+  margin-right: 12px;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+  background-color: #e8f5e9;
+  color: #4caf50;
+}
+
+.student-basic-info {
+  flex: 1;
+}
+
+.student-name-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.student-name {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.student-goal {
+  font-size: 12px;
+  color: #1890ff;
+  background-color: #e6f7ff;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.student-details {
+  font-size: 12px;
+  color: #666;
+}
+
+.student-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  line-height: 1;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.message-button {
+  background-color: #1890ff;
+  color: white;
+}
+
+.call-button {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.button-icon {
+  margin-right: 4px;
+}
+
+.next-session {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.next-session-label {
+  font-size: 10px;
+  color: #999;
+}
+
+.next-session-date {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* 数据卡片通用样式 */
+.data-card {
+  margin: 12px;
+  padding: 16px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  width: calc(100% - 24px);
+  box-sizing: border-box;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.weight-change {
+  font-size: 12px;
+  color: #52c41a;
+}
+
+.chart-container {
+  height: 160px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.weight-chart {
+  width: 100%;
+  height: 100%;
+}
+
+/* 关键数据样式 */
+.key-metrics {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.metric-item {
+  flex: 1;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 4px;
+  box-sizing: border-box;
+}
+
+.metric-item:first-child {
+  margin-left: 0;
+}
+
+.metric-item:last-child {
+  margin-right: 0;
+}
+
+.metric-label {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.metric-value {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.metric-change {
+  font-size: 11px;
+  color: #52c41a;
+}
+
+/* 身体围度数据样式 */
+.unit-label {
+  font-size: 12px;
+  color: #999;
+}
+
+.measurements-list {
+  margin-top: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.measurement-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.measurement-item:last-child {
+  border-bottom: none;
+}
+
+.measurement-label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.measurement-data {
+  display: flex;
+  align-items: center;
+}
+
+.measurement-value {
+  font-size: 14px;
+  font-weight: 500;
+  margin-right: 8px;
+}
+
+.measurement-change {
+  font-size: 12px;
+}
+
+.change-positive {
+  color: #52c41a;
+}
+
+.change-negative {
+  color: #f5222d;
+}
+
+/* 添加页面标题样式 */
+.page-title-container {
+  background-color: #07C160;
+  padding: 15px 20px;
+  padding-top: calc(44px + var(--status-bar-height));
+  color: black;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: bold;
+} 

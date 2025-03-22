@@ -22,6 +22,7 @@ interface Student {
   height: number;
   weight: number;
   weightChange: number;
+  usageCount: number;
 }
 
 interface AIInsight {
@@ -174,6 +175,7 @@ Page({
             height: 178,
             weight: 75.5,
             weightChange: 0.8,
+            usageCount: 5,
           },
           {
             id: 2,
@@ -187,6 +189,7 @@ Page({
             height: 175,
             weight: 80.2,
             weightChange: -1.2,
+            usageCount: 3,
           },
           {
             id: 3,
@@ -200,6 +203,7 @@ Page({
             height: 182,
             weight: 78.0,
             weightChange: 0.0,
+            usageCount: 2,
           },
           {
             id: 4,
@@ -213,6 +217,7 @@ Page({
             height: 180,
             weight: 82.5,
             weightChange: 0.5,
+            usageCount: 4,
           },
           {
             id: 5,
@@ -226,6 +231,7 @@ Page({
             height: 168,
             weight: 65.8,
             weightChange: -0.7,
+            usageCount: 1,
           },
         ];
 
@@ -282,43 +288,13 @@ Page({
     }
   },
 
-  // 搜索输入
-  onSearchInput(e: any) {
-    this.setData({
-      searchText: e.detail.value,
-    });
-    // 实际应用中可以实现实时搜索功能
-    this.searchPlans();
-  },
-
-  // 搜索计划
+  // 搜索训练计划
   searchPlans() {
-    // 实际应用中应该从服务器搜索数据
-    // request({
-    //   url: '/api/search-plans',
-    //   method: 'POST',
-    //   data: {
-    //     keyword: this.data.searchText,
-    //     filter: this.data.filterOptions[this.data.filterIndex]
-    //   }
-    // }).then(res => {
-    //   this.setData({
-    //     templates: res.data.templates,
-    //     students: res.data.students
-    //   });
-    // });
+    // 直接使用当前输入框中的文本进行搜索
+    this.fetchTrainingPlans(true);
 
-    console.log("搜索关键词:", this.data.searchText);
-    console.log("过滤条件:", this.data.filterOptions[this.data.filterIndex]);
-  },
-
-  // 过滤选择
-  onFilterChange(e: any) {
-    this.setData({
-      filterIndex: e.detail.value,
-    });
-    // 实际应用中可以实现过滤功能
-    this.searchPlans();
+    // 收起键盘
+    wx.hideKeyboard();
   },
 
   // 查看模板详情
@@ -506,5 +482,15 @@ Page({
     wx.navigateTo({
       url: `../planDetail/planDetail?isNew=true&from=training`,
     });
+  },
+
+  // 查看今日训练
+  viewTodayTraining(e: any) {
+    const studentId = e.currentTarget.dataset.studentId;
+    if (studentId) {
+      wx.navigateTo({
+        url: `/pages/todayTraining/todayTraining?id=${studentId}`,
+      });
+    }
   },
 });

@@ -1,0 +1,244 @@
+<!-- 学生训练详情页面 -->
+<view class="header" style="padding-top: {{statusBarHeight}}px;">
+  <view class="back-button" bindtap="goBack">←</view>
+  训练详情
+</view>
+
+<view class="container container-with-tabs">
+  <view class="content-wrapper">
+    <!-- 学员信息部分 -->
+    <view class="student-header">
+      <view class="avatar" style="{{student.avatarStyle}}">{{student.avatar}}</view>
+      <view class="student-info">
+        <view class="student-name">{{student.name}} - {{student.planName}}</view>
+        <view class="student-tags">
+          <text class="tag {{student.phaseTagClass}}">{{student.phase}}</text>
+          <text class="tag">第{{student.week}}周</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 日期选择器 -->
+    <view class="date-selector">
+      <view class="date-nav">
+        <view class="date-arrow" bindtap="previousDay">◀</view>
+        <picker mode="date" value="{{selectedDate}}" start="2023-01-01" end="2025-12-31" bindchange="onDateChange">
+          <view class="selected-date">
+            {{selectedDate}} {{isToday ? '(今天)' : ''}}
+          </view>
+        </picker>
+        <view class="date-arrow" bindtap="nextDay">▶</view>
+      </view>
+    </view>
+    
+    <!-- 完成情况概览 -->
+    <view class="completion-overview">
+      <view class="completion-item {{trainingCompletion.status}}">
+        <view class="completion-icon">🏋️</view>
+        <view class="completion-info">
+          <view class="completion-title">训练动作</view>
+          <view class="completion-status">{{trainingCompletion.text}}</view>
+        </view>
+      </view>
+      
+      <view class="completion-item {{dietCompletion.status}}">
+        <view class="completion-icon">🍽️</view>
+        <view class="completion-info">
+          <view class="completion-title">饮食计划</view>
+          <view class="completion-status">{{dietCompletion.text}}</view>
+        </view>
+      </view>
+      
+      <view class="completion-item {{supplementCompletion.status}}">
+        <view class="completion-icon">💊</view>
+        <view class="completion-info">
+          <view class="completion-title">补剂建议</view>
+          <view class="completion-status">{{supplementCompletion.text}}</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 内置标签页 -->
+    <view class="plan-tabs">
+      <view class="plan-tab {{activeTab === 'training' ? 'active' : ''}}" bindtap="switchTab" data-tab="training">
+        训练动作
+      </view>
+      <view class="plan-tab {{activeTab === 'diet' ? 'active' : ''}}" bindtap="switchTab" data-tab="diet">
+        饮食计划
+      </view>
+      <view class="plan-tab {{activeTab === 'supplements' ? 'active' : ''}}" bindtap="switchTab" data-tab="supplements">
+        补剂建议
+      </view>
+    </view>
+
+    <!-- 训练动作内容 - 只读版 -->
+    <view class="tab-content" wx:if="{{activeTab === 'training'}}">
+      <block wx:if="{{trainingDay}}">
+        <view class="plan-day">
+          <view class="day-title">
+            <view>{{trainingDay.day}} ({{trainingDay.focus}})</view>
+          </view>
+          
+          <view wx:for="{{trainingDay.exercises}}" wx:for-item="exercise" wx:key="name" wx:for-index="exerciseIndex"
+                class="workout-item {{exercise.completed ? 'completed' : ''}}">
+            <view class="workout-header">
+              <view class="workout-name">{{exercise.name}}</view>
+              <view class="workout-completion">
+                <text class="{{exercise.completed ? 'completed-text' : 'incomplete-text'}}">
+                  {{exercise.completed ? '已完成' : '未完成'}}
+                </text>
+              </view>
+            </view>
+            
+            <!-- 显示组数信息 -->
+            <view class="workout-sets">
+              <view class="set-item" wx:for="{{exercise.sets}}" wx:for-item="set" wx:key="index">
+                <text class="set-number">组{{index + 1}}:</text>
+                <text class="set-weight">{{set.weight}}</text>
+                <text class="set-reps">{{set.reps}}</text>
+              </view>
+            </view>
+            
+            <view class="workout-note" wx:if="{{exercise.note}}">
+              <text class="note-label">备注:</text> {{exercise.note}}
+            </view>
+          </view>
+        </view>
+      </block>
+      <view wx:else class="no-training">
+        <view class="no-training-text">今日无训练安排</view>
+      </view>
+    </view>
+
+    <!-- 饮食计划内容 - 只读版 -->
+    <view class="tab-content" wx:if="{{activeTab === 'diet'}}">
+      <view class="macro-nutrients-horizontal">
+        <view class="macro-item">
+          <view class="macro-value">{{dietPlan.calories}}kcal</view>
+          <view class="macro-label">总热量</view>
+        </view>
+        <view class="macro-item">
+          <view class="macro-value">{{dietPlan.protein}}g</view>
+          <view class="macro-label">蛋白质</view>
+        </view>
+        <view class="macro-item">
+          <view class="macro-value">{{dietPlan.carbs}}g</view>
+          <view class="macro-label">碳水</view>
+        </view>
+        <view class="macro-item">
+          <view class="macro-value">{{dietPlan.fat}}g</view>
+          <view class="macro-label">脂肪</view>
+        </view>
+      </view>
+      
+      <block wx:for="{{dietPlan.meals}}" wx:key="name" wx:for-item="meal" wx:for-index="mealIndex">
+        <view class="meal-container {{meal.completed ? 'completed' : ''}}">
+          <view class="meal-header">
+            <view class="meal-title">
+              <text>{{meal.name}}</text>
+              <text wx:if="{{meal.time}}" class="meal-time">{{meal.time}}</text>
+            </view>
+            <view class="meal-completion">
+              <text class="{{meal.completed ? 'completed-text' : 'incomplete-text'}}">
+                {{meal.completed ? '已完成' : '未完成'}}
+              </text>
+            </view>
+          </view>
+          
+          <!-- 显示食物信息 -->
+          <view class="meal-item" wx:for="{{meal.foods}}" wx:for-item="food" wx:key="name">
+            <view class="meal-item-content">
+              <view class="meal-item-name">{{food.name}}</view>
+              <view class="meal-item-amount">{{food.amount}}</view>
+            </view>
+          </view>
+        </view>
+      </block>
+
+      <!-- 饮食注意事项 -->
+      <view class="diet-notes" wx:if="{{dietPlan.notes}}">
+        <view class="diet-notes-header">
+          <view class="diet-notes-title">饮食注意事项</view>
+        </view>
+        <view class="diet-notes-content">{{dietPlan.notes}}</view>
+      </view>
+    </view>
+
+    <!-- 补剂建议内容 - 简化版，只显示时段完成情况 -->
+    <view class="tab-content" wx:if="{{activeTab === 'supplements'}}">
+      <!-- 早上补剂 -->
+      <view class="supplement-container" wx:if="{{hasMorningSupplements}}">
+        <view class="supplement-header">
+          <view class="supplement-title">
+            <text>早上</text>
+          </view>
+          <view class="supplement-completion">
+            <text class="{{morningSupplementsCompleted ? 'completed-text' : 'incomplete-text'}}">
+              {{morningSupplementsCompleted ? '已完成' : '未完成'}}
+            </text>
+          </view>
+        </view>
+        
+        <!-- 早上补剂列表 -->
+        <view class="supplement-list">
+          <view wx:for="{{supplements}}" wx:key="name" wx:if="{{item.morning}}">
+            {{item.name}} {{item.morning}}
+          </view>
+        </view>
+      </view>
+      
+      <!-- 中午补剂 -->
+      <view class="supplement-container" wx:if="{{hasNoonSupplements}}">
+        <view class="supplement-header">
+          <view class="supplement-title">
+            <text>中午</text>
+          </view>
+          <view class="supplement-completion">
+            <text class="{{noonSupplementsCompleted ? 'completed-text' : 'incomplete-text'}}">
+              {{noonSupplementsCompleted ? '已完成' : '未完成'}}
+            </text>
+          </view>
+        </view>
+        
+        <!-- 中午补剂列表 -->
+        <view class="supplement-list">
+          <view wx:for="{{supplements}}" wx:key="name" wx:if="{{item.noon}}">
+            {{item.name}} {{item.noon}}
+          </view>
+        </view>
+      </view>
+      
+      <!-- 晚上补剂 -->
+      <view class="supplement-container" wx:if="{{hasEveningSupplements}}">
+        <view class="supplement-header">
+          <view class="supplement-title">
+            <text>晚上</text>
+          </view>
+          <view class="supplement-completion">
+            <text class="{{eveningSupplementsCompleted ? 'completed-text' : 'incomplete-text'}}">
+              {{eveningSupplementsCompleted ? '已完成' : '未完成'}}
+            </text>
+          </view>
+        </view>
+        
+        <!-- 晚上补剂列表 -->
+        <view class="supplement-list">
+          <view wx:for="{{supplements}}" wx:key="name" wx:if="{{item.evening}}">
+            {{item.name}} {{item.evening}}
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 操作按钮 -->
+    <view class="action-buttons">
+      <button class="button button-primary" bindtap="sendFeedback">
+        <text class="button-icon">💬</text> 发送反馈
+      </button>
+      <button class="button button-outline" bindtap="editPlan">
+        <text class="button-icon">✏️</text> 编辑计划
+      </button>
+    </view>
+  </view>
+
+</view> 

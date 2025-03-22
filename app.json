@@ -1,0 +1,17 @@
+{
+  "pages": [
+    "pages/coachX/coachX",
+    "pages/students/students",
+    "pages/training/training",
+    "pages/planDetail/planDetail",
+    "pages/todayTraining/todayTraining"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "智能教练助手",
+    "navigationBarTextStyle": "black"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+} 

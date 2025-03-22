@@ -4,14 +4,10 @@
 </view>
 
 <view class="container container-with-tabs">
-  <!-- 搜索与过滤 -->
-  <view class="search-filter">
-    <input type="text" placeholder="搜索学员..." class="search-input" bindinput="onSearchInput" />
-    <picker bindchange="onFilterChange" value="{{filterIndex}}" range="{{filterOptions}}">
-      <view class="filter-select">
-        {{filterOptions[filterIndex]}}
-      </view>
-    </picker>
+  <!-- 搜索部分 - 简化版 -->
+  <view class="search-container">
+    <input type="text" placeholder="输入学员名字..." class="search-input" bindinput="onSearchInput" value="{{searchText}}" />
+    <button class="search-button" bindtap="searchStudents">搜索</button>
   </view>
   
   <!-- 学员统计 -->
@@ -23,6 +19,10 @@
       <view class="stat-card {{filterIndex === 0 ? 'selected' : ''}}" bindtap="filterByType" data-type="all">
         <view class="stat-number">{{stats.total}}</view>
         <view class="stat-label">总学员</view>
+      </view>
+      <view class="stat-card {{filterIndex === 3 ? 'selected' : ''}}" bindtap="filterByType" data-type="active">
+        <view class="stat-number">{{stats.active}}</view>
+        <view class="stat-label">需要回复</view>
       </view>
       <view class="stat-card {{filterIndex === 1 ? 'selected' : ''}}" bindtap="filterByType" data-type="active">
         <view class="stat-number">{{stats.active}}</view>
@@ -60,7 +60,9 @@
     <block wx:else>
       <view class="student-card" 
             wx:for="{{students}}" 
-            wx:key="id">
+            wx:key="id"
+            bindtap="onStudentCardTap"
+            data-student-id="{{item.id}}">
         <view class="avatar" style="{{item.avatarStyle}}">{{item.avatar}}</view>
         <view class="student-info">
           <view class="student-name">{{item.name}}</view>
@@ -70,7 +72,7 @@
           </view>
         </view>
         <view class="student-actions">
-          <text class="action-btn" bindtap="showStudentOptions" data-student-id="{{item.id}}">操作</text>
+          <text class="action-btn" catchtap="showStudentOptions" data-student-id="{{item.id}}">操作</text>
         </view>
       </view>
       

@@ -4,14 +4,17 @@
     "pages/students/students",
     "pages/training/training",
     "pages/planDetail/planDetail",
+    "pages/todayTraining/todayTraining",
     "pages/index/index",
-    "pages/logs/logs"
+    "pages/logs/logs",
+    "pages/studentDetail/studentDetail"
   ],
   "window": {
     "navigationBarTextStyle": "white",
     "navigationBarTitleText": "智能教练助手",
     "navigationBarBackgroundColor": "#07C160",
-    "backgroundTextStyle": "light"
+    "backgroundTextStyle": "light",
+    "navigationStyle": "custom"
   },
   "style": "v2",
   "componentFramework": "glass-easel",

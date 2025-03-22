@@ -1,85 +1,72 @@
 <!-- AI助手页面 -->
-<view class="header" style="padding-top: {{statusBarHeight}}px;">
-  CoachX 智能教练助手
-</view>
-
+<view class="header" style="padding-top: {{statusBarHeight}}px;">CoachX 智能教练助手</view>
 <view class="container container-with-tabs" wx:if="{{currentPage === 'ai-assistant-page'}}">
-  <!-- AI功能卡片 -->
-  <view class="card ai-card">
-    <view class="ai-icon-bg">🤖</view>
-    <view class="ai-title">AI助手</view>
-
-    <view class="ai-button-group">
-      <button class="ai-button" bindtap="onAIFeature" data-feature="report" disabled="{{generatingReport}}">
-        <text class="ai-button-icon">📊</text>一键生成今日训练报告
-      </button>
-      <button class="ai-button" bindtap="onAIFeature" data-feature="analysis">
-        <text class="ai-button-icon">📋</text>数据分析报告
-      </button>
-    </view>
-
-    <view class="ai-last-analysis">
-      <text wx:if="{{loading.aiSuggestion}}">加载中...</text>
-      <text wx:else>上次AI分析: {{aiSuggestion.timestamp}}</text>
-    </view>
-  </view>
-
-  <!-- 快速信息卡片 -->
-  <view class="card">
-    <view class="card-header">
-      <view class="card-title">今日概览</view>
-      <view class="ai-generated">
-        <text class="ai-icon">🤖</text>AI生成
-      </view>
-    </view>
-
+  <!-- 今日概览卡片 - 现代简洁设计 -->
+  <view class="overview-card">
+    <view class="overview-title">今日概览</view>
     <view wx:if="{{loading.dailyStats}}" class="loading-container">
       <view class="loading-text">加载中...</view>
     </view>
-
-    <view wx:else class="stat-row">
+    <view wx:else class="overview-stats">
       <view class="stat-item">
-        <view class="stat-number stat-completed">{{dailyStats.completedTrainings}}</view>
+        <view class="stat-number completed">{{dailyStats.completedTrainings}}</view>
         <view class="stat-label">已完成训练</view>
       </view>
+      <view class="stat-divider"></view>
       <view class="stat-item">
-        <view class="stat-number stat-warning">{{dailyStats.needReminders}}</view>
+        <view class="stat-number warning">{{dailyStats.needReminders}}</view>
         <view class="stat-label">需要提醒</view>
       </view>
+      <view class="stat-divider"></view>
       <view class="stat-item">
-        <view class="stat-number stat-info">{{dailyStats.plansToUpdate}}</view>
+        <view class="stat-number info">{{dailyStats.plansToUpdate}}</view>
         <view class="stat-label">计划待更新</view>
       </view>
-    </view>
-
-    <view class="ai-suggestion">
-      <view class="ai-suggestion-title">
-        <text class="ai-suggestion-icon">💡</text>AI建议
-      </view>
-      <view class="ai-suggestion-content">
-        <text wx:if="{{loading.aiSuggestion}}">加载中...</text>
-        <text wx:else>{{aiSuggestion.content}}</text>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <view class="stat-number unread">{{dailyStats.unreadMessages}}</view>
+        <view class="stat-label">未回复</view>
       </view>
     </view>
+    <button class="report-button" bindtap="onAIFeature" data-feature="report" disabled="{{generatingReport}}">
+      AI总结报告
+    </button>
   </view>
 
+    <!-- 需要回复的学员 - 新增部分 -->
+  <block>
+    <view class="section-header">
+      <view class="section-title">需要回复的学员</view>
+    </view>
+    <view wx:if="{{loading.studentsNeedReply}}" class="loading-container">
+      <view class="loading-text">加载中...</view>
+    </view>
+    <block wx:else>
+      <view class="student-card unread-student" wx:for="{{studentsNeedReply}}" wx:key="id" bindtap="viewStudentMessage" data-student="{{item.name}}" data-studentId="{{item.id}}">
+        <view class="avatar unread-avatar">{{item.avatar}}</view>
+        <view class="student-info">
+          <view class="student-name">{{item.name}}</view>
+          <view class="student-status unread-status">{{item.lastMessage}}</view>
+          <view class="message-time">{{item.messageTime}}</view>
+        </view>
+        <view>
+          <button class="ai-action-button unread-button" catchtap="replyStudent" data-student="{{item.name}}" data-studentId="{{item.id}}">
+            回复
+          </button>
+        </view>
+      </view>
+    </block>
+  </block>
   <!-- 需要注意的学员 -->
   <view class="section-header">
     <view class="section-title">需要注意的学员</view>
-    <view class="view-all" bindtap="viewAllStudents">全部查看</view>
+    <view class="remind-all" bindtap="remindAllStudents">一键提醒</view>
   </view>
-
   <view wx:if="{{loading.studentsNeedAttention}}" class="loading-container">
     <view class="loading-text">加载中...</view>
   </view>
-
   <block wx:else>
-    <view class="student-card warning-student" 
-          wx:for="{{studentsNeedAttention}}" 
-          wx:key="id"
-          bindtap="viewStudentDetail" 
-          data-student="{{item.name}}"
-          data-student-id="{{item.id}}">
+    <view class="student-card warning-student" wx:for="{{studentsNeedAttention}}" wx:key="id" bindtap="viewStudentTodayTrainingDetail" data-student="{{item.name}}" data-studentId="{{item.id}}">
       <view class="avatar warning-avatar">{{item.avatar}}</view>
       <view class="student-info">
         <view class="student-name">{{item.name}}</view>
@@ -89,46 +76,13 @@
         </view>
       </view>
       <view>
-        <button class="ai-action-button" catchtap="remindStudent" data-student="{{item.name}}" data-student-id="{{item.id}}">
-          <text class="button-icon">🔔</text>提醒
+        <button class="ai-action-button" catchtap="remindStudent" data-student="{{item.name}}" data-studentId="{{item.id}}">
+          <text class="button-icon">🔔</text>
+          提醒
         </button>
       </view>
     </view>
   </block>
-
-  <!-- 表现优秀的学员 -->
-  <view class="section-header">
-    <view class="section-title">表现优秀的学员</view>
-    <view class="view-all" bindtap="viewAllStudents">全部查看</view>
-  </view>
-
-  <view wx:if="{{loading.excellentStudents}}" class="loading-container">
-    <view class="loading-text">加载中...</view>
-  </view>
-
-  <block wx:else>
-    <view class="student-card excellent-student" 
-          wx:for="{{excellentStudents}}" 
-          wx:key="id"
-          bindtap="viewStudentDetail" 
-          data-student="{{item.name}}"
-          data-student-id="{{item.id}}">
-      <view class="avatar excellent-avatar">{{item.avatar}}</view>
-      <view class="student-info">
-        <view class="student-name">{{item.name}}</view>
-        <view class="student-status {{item.statusClass}}">{{item.status}}</view>
-        <view>
-          <text class="tag {{item.tagClass}}">{{item.tag}}</text>
-        </view>
-      </view>
-      <view>
-        <button class="ai-action-button excellent-button" catchtap="praiseStudent" data-student="{{item.name}}" data-student-id="{{item.id}}">
-          <text class="button-icon">👍</text>鼓励
-        </button>
-      </view>
-    </view>
-  </block>
-
   <!-- 底部导航栏 -->
   <view class="tab-bar">
     <view class="tab {{currentTab === 'assistant' ? 'active' : ''}}" bindtap="switchTab" data-tab="assistant">
@@ -145,23 +99,19 @@
     </view>
   </view>
 </view>
-
 <!-- 训练计划详情页面 -->
 <view class="container container-with-tabs" wx:if="{{currentPage === 'plan-detail-page'}}">
   <!-- 训练计划详情内容 -->
 </view>
-
 <!-- 学员列表页面 -->
 <view class="container container-with-tabs" wx:if="{{currentPage === 'students-page'}}">
   <!-- 学员列表内容 -->
 </view>
-
 <!-- 学员详情页面 -->
 <view class="container container-with-tabs" wx:if="{{currentPage === 'student-detail-page'}}">
   <!-- 学员详情内容 -->
 </view>
-
 <!-- 训练计划页面 -->
 <view class="container container-with-tabs" wx:if="{{currentPage === 'training-plan-page'}}">
   <!-- 训练计划内容 -->
-</view> 
+</view>

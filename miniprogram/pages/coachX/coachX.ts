@@ -5,6 +5,7 @@ interface DailyStat {
   completedTrainings: number;
   needReminders: number;
   plansToUpdate: number;
+  unreadMessages: number;
 }
 
 interface AISuggestion {
@@ -24,6 +25,12 @@ interface Student {
   daysInactive: number;
 }
 
+// 添加需要回复的学员接口
+interface StudentMessage extends Student {
+  lastMessage: string;
+  messageTime: string;
+}
+
 Page({
   /**
    * 页面的初始数据
@@ -35,12 +42,12 @@ Page({
     dailyStats: {} as DailyStat,
     aiSuggestion: {} as AISuggestion,
     studentsNeedAttention: [] as Student[],
-    excellentStudents: [] as Student[],
+    studentsNeedReply: [] as StudentMessage[],
     loading: {
       dailyStats: true,
       aiSuggestion: true,
       studentsNeedAttention: true,
-      excellentStudents: true,
+      studentsNeedReply: true,
     },
     generatingReport: false,
   },
@@ -69,25 +76,44 @@ Page({
    * 查看所有学员
    */
   viewAllStudents() {
-    this.setData({
-      currentPage: "students-page",
-      currentTab: "students",
+    wx.navigateTo({
+      url: "/pages/students/students",
+      fail: (err) => {
+        console.error("导航到学员管理页面失败:", err);
+        wx.showToast({
+          title: "页面跳转失败",
+          icon: "none",
+        });
+      },
     });
   },
 
   /**
    * 查看学员详情
    */
-  viewStudentDetail(e: any) {
-    const studentName = e.currentTarget.dataset.student;
-    wx.showToast({
-      title: `查看${studentName}的详情`,
-      icon: "none",
-    });
-    // 实际应用中应该跳转到学员详情页
-    this.setData({
-      currentPage: "student-detail-page",
-    });
+  viewStudentTodayTrainingDetail(e: any) {
+    const studentId = e.currentTarget.dataset.studentid; // 注意：微信小程序会将驼峰命名转为全小写
+
+    if (studentId) {
+      const url = `/pages/todayTraining/todayTraining?id=${studentId}`;
+
+      wx.navigateTo({
+        url: url,
+        fail: (err) => {
+          console.error("导航失败:", err); // 添加失败回调
+          wx.showToast({
+            title: "页面跳转失败",
+            icon: "none",
+          });
+        },
+      });
+    } else {
+      console.error("未获取到学员ID"); // 添加错误信息
+      wx.showToast({
+        title: "未获取到学员ID",
+        icon: "none",
+      });
+    }
   },
 
   /**
@@ -147,8 +173,6 @@ Page({
 
     if (feature === "report") {
       this.generateDailyReport();
-    } else if (feature === "analysis") {
-      this.generateDataAnalysis();
     }
   },
 
@@ -183,7 +207,7 @@ Page({
     this.fetchDailyStats();
     this.fetchAISuggestion();
     this.fetchStudentsNeedAttention();
-    this.fetchExcellentStudents();
+    this.fetchStudentsNeedReply();
   },
 
   /**
@@ -198,7 +222,7 @@ Page({
     // 页面显示时刷新数据
     this.fetchDailyStats();
     this.fetchStudentsNeedAttention();
-    this.fetchExcellentStudents();
+    this.fetchStudentsNeedReply();
   },
 
   /**
@@ -245,6 +269,7 @@ Page({
           completedTrainings: 8,
           needReminders: 5,
           plansToUpdate: 3,
+          unreadMessages: 2,
         };
 
         this.setData({
@@ -421,7 +446,7 @@ Page({
           if (res.confirm) {
             // 实际应用中可以跳转到报告详情页
             wx.showToast({
-              title: "查看训练报告",
+              title: "敬请期待",
               icon: "none",
             });
           }
@@ -430,111 +455,31 @@ Page({
     }, 2000);
   },
 
-  // 生成数据分析报告
-  generateDataAnalysis() {
-    wx.showToast({
-      title: "生成数据分析报告",
-      icon: "none",
-    });
-
-    // 实际应用中可以跳转到数据分析页面
-    // wx.navigateTo({
-    //   url: '/pages/dataAnalysis/dataAnalysis'
-    // });
-  },
-
-  // 获取优秀学员
-  async fetchExcellentStudents() {
-    try {
-      this.setData({
-        "loading.excellentStudents": true,
-      });
-
-      // 实际应用中应该从服务器获取数据
-      // const res = await request({
-      //   url: '/api/excellent-students',
-      //   method: 'GET'
-      // });
-
-      // 模拟从服务器获取数据
-      setTimeout(() => {
-        const excellentStudents = [
-          {
-            id: 4,
-            name: "张三",
-            avatar: "张",
-            avatarStyle: "",
-            status: "连续训练14天",
-            statusClass: "excellent-status",
-            tag: "增肌期",
-            tagClass: "tag-bulking",
-            daysInactive: 0,
-          },
-          {
-            id: 5,
-            name: "王五",
-            avatar: "王",
-            avatarStyle: "",
-            status: "进步显著",
-            statusClass: "excellent-status",
-            tag: "维持期",
-            tagClass: "tag-maintenance",
-            daysInactive: 0,
-          },
-          {
-            id: 6,
-            name: "孙七",
-            avatar: "孙",
-            avatarStyle: "",
-            status: "达成月度目标",
-            statusClass: "excellent-status",
-            tag: "增肌期",
-            tagClass: "tag-bulking",
-            daysInactive: 0,
-          },
-        ];
-
-        this.setData({
-          excellentStudents,
-          "loading.excellentStudents": false,
-        });
-      }, 500);
-    } catch (error) {
-      console.error("获取优秀学员失败", error);
-      wx.showToast({
-        title: "获取优秀学员失败",
-        icon: "none",
-      });
-      this.setData({
-        "loading.excellentStudents": false,
-      });
-    }
-  },
-
-  // 鼓励学员
-  praiseStudent(e: any) {
-    const studentName = e.currentTarget.dataset.student;
+  /**
+   * 一键提醒所有需要注意的学员
+   */
+  remindAllStudents() {
     wx.showLoading({
-      title: "发送鼓励中...",
+      title: "发送提醒中...",
     });
 
-    // 实际应用中应该调用API发送鼓励
+    // 实际应用中应该调用API发送提醒
     // request({
-    //   url: '/api/praise-student',
+    //   url: '/api/remind-all-students',
     //   method: 'POST',
     //   data: {
-    //     studentId: e.currentTarget.dataset.studentId
+    //     studentIds: this.data.studentsNeedAttention.map(student => student.id)
     //   }
     // }).then(res => {
     //   wx.hideLoading();
     //   wx.showToast({
-    //     title: '鼓励已发送',
+    //     title: '提醒已发送',
     //     icon: 'success'
     //   });
     // }).catch(err => {
     //   wx.hideLoading();
     //   wx.showToast({
-    //     title: '发送鼓励失败',
+    //     title: '发送提醒失败',
     //     icon: 'none'
     //   });
     // });
@@ -543,9 +488,108 @@ Page({
     setTimeout(() => {
       wx.hideLoading();
       wx.showToast({
-        title: `已鼓励${studentName}`,
+        title: `已提醒${this.data.studentsNeedAttention.length}名学员`,
         icon: "success",
       });
     }, 1000);
+  },
+
+  // 获取需要回复的学员
+  async fetchStudentsNeedReply() {
+    try {
+      this.setData({
+        "loading.studentsNeedReply": true,
+      });
+
+      // 实际应用中应该从服务器获取数据
+      // const res = await request({
+      //   url: '/api/students-need-reply',
+      //   method: 'GET'
+      // });
+
+      // 模拟从服务器获取数据
+      setTimeout(() => {
+        const studentsNeedReply = [
+          {
+            id: 7,
+            name: "张三",
+            avatar: "张",
+            avatarStyle: "",
+            status: "",
+            statusClass: "",
+            tag: "增肌期",
+            tagClass: "tag-bulking",
+            daysInactive: 0,
+            lastMessage: "教练，我的肩膀有点酸痛，今天的训练...",
+            messageTime: "10:30",
+          },
+          {
+            id: 8,
+            name: "王五",
+            avatar: "王",
+            avatarStyle: "",
+            status: "",
+            statusClass: "",
+            tag: "减脂期",
+            tagClass: "tag-cutting",
+            daysInactive: 0,
+            lastMessage: "请问今天的有氧训练需要做多久？",
+            messageTime: "昨天",
+          },
+        ];
+
+        this.setData({
+          studentsNeedReply,
+          "loading.studentsNeedReply": false,
+        });
+      }, 500);
+    } catch (error) {
+      console.error("获取需要回复的学员失败", error);
+      wx.showToast({
+        title: "获取需要回复的学员失败",
+        icon: "none",
+      });
+      this.setData({
+        "loading.studentsNeedReply": false,
+      });
+    }
+  },
+
+  // 查看学员消息
+  viewStudentMessage(e: any) {
+    const studentId = e.currentTarget.dataset.studentid;
+    const studentName = e.currentTarget.dataset.student;
+
+    if (studentId) {
+      wx.navigateTo({
+        url: `/pages/chat/chat?id=${studentId}&name=${studentName}`,
+        fail: (err) => {
+          console.error("导航到聊天页面失败:", err);
+          wx.showToast({
+            title: "页面跳转失败",
+            icon: "none",
+          });
+        },
+      });
+    }
+  },
+
+  // 回复学员
+  replyStudent(e: any) {
+    const studentId = e.currentTarget.dataset.studentid;
+    const studentName = e.currentTarget.dataset.student;
+
+    if (studentId) {
+      wx.navigateTo({
+        url: `/pages/chat/chat?id=${studentId}&name=${studentName}`,
+        fail: (err) => {
+          console.error("导航到聊天页面失败:", err);
+          wx.showToast({
+            title: "页面跳转失败",
+            icon: "none",
+          });
+        },
+      });
+    }
   },
 });

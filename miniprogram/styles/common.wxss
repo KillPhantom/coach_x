@@ -87,6 +87,8 @@ page {
 
 .ai-button-icon {
   margin-right: 6px;
+  color:white;
+
 }
 
 /* 标签样式 */

@@ -1,0 +1,80 @@
+<!-- 学员详情页面 -->
+<view class="header" style="padding-top: {{statusBarHeight}}px;">
+  <view class="back-button" bindtap="goBack">
+    <text class="back-icon">←</text>
+  </view>
+  <view class="header-title">学员详情</view>
+</view>
+
+<view class="container">
+  <!-- 学员基本信息卡片 -->
+  <view class="student-card">
+    <view class="student-info-header">
+      <view class="avatar-container">
+        <view class="avatar" style="{{student.avatarStyle}}">{{student.avatar}}</view>
+      </view>
+      <view class="student-basic-info">
+        <view class="student-name-container">
+          <text class="student-name">{{student.name}}</text>
+          <text class="student-goal">{{student.goal}}</text>
+        </view>
+        <text class="student-details">{{student.age}}岁 | {{student.height}}cm | 加入: {{student.joinDate}} | 到期: {{student.expirationDate}}</text>
+      </view>
+    </view>
+    
+    <view class="student-actions">
+
+    </view>
+  </view>
+  
+  <!-- 体重变化图表 -->
+  <view class="data-card">
+    <view class="card-header">
+      <text class="card-title">体重变化</text>
+      <text class="weight-change">{{weightChange}} (近6个月)</text>
+    </view>
+    <view class="chart-container">
+      <canvas canvas-id="weightChart" class="weight-chart"></canvas>
+    </view>
+  </view>
+  
+  <!-- 关键数据卡片 -->
+  <view class="data-card">
+    <text class="card-title">关键数据</text>
+    <view class="key-metrics">
+      <view class="metric-item">
+        <text class="metric-label">当前体重</text>
+        <text class="metric-value">{{currentWeight}}kg</text>
+        <text class="metric-change">{{weightMonthChange}} 较上月</text>
+      </view>
+      <view class="metric-item">
+        <text class="metric-label">体脂率</text>
+        <text class="metric-value">{{bodyFatPercentage}}%</text>
+        <text class="metric-change">{{bodyFatChange}} 较上月</text>
+      </view>
+      <view class="metric-item">
+        <text class="metric-label">基础代谢</text>
+        <text class="metric-value">{{bmr}}</text>
+        <text class="metric-change">{{bmrChange}} 较上月</text>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 身体围度数据 -->
+  <view class="data-card">
+    <view class="card-header">
+      <text class="card-title">身体围度</text>
+      <text class="unit-label">单位: cm</text>
+    </view>
+    
+    <view class="measurements-list">
+      <view class="measurement-item" wx:for="{{measurements}}" wx:key="label">
+        <text class="measurement-label">{{item.label}}</text>
+        <view class="measurement-data">
+          <text class="measurement-value">{{item.value}}</text>
+          <text class="measurement-change {{item.changeClass}}">{{item.change}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view> 
