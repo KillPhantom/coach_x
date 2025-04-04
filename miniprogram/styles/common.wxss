@@ -105,16 +105,26 @@ page {
 .tag-bulking {
   background: #e6f7ff;
   color: #1890ff;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 10px;
 }
 
 .tag-cutting {
   background: #fff7e6;
   color: #fa8c16;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+
 }
 
-.tag-maintenance {
+.tag-compete {
   background: #f6ffed;
-  color: #52c41a;
+  color: #e91515;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 10px;
 }
 
 /* 底部导航栏 */
@@ -179,8 +189,8 @@ page {
 
 /* 头像样式 */
 .avatar {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background-color: #e8f5e9;
   margin-right: 12px;

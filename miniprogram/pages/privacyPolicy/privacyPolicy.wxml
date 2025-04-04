@@ -1,0 +1,82 @@
+<view class="container">
+  <view class="header">
+    <view class="back-button" bindtap="goBack">←</view>
+    隐私政策
+  </view>
+  
+  <view class="content">
+    <view class="title">隐私政策与服务条款</view>
+    <view class="last-updated">最后更新日期：2023年12月1日</view>
+    
+    <view class="section">
+      <view class="section-title">1. 引言</view>
+      <view class="paragraph">
+        欢迎使用"健身教练助手"小程序。我们非常重视您的个人信息和隐私保护。本隐私政策旨在帮助您了解我们如何收集、使用、存储和共享您的个人信息，以及您享有的相关权利。
+      </view>
+    </view>
+    
+    <view class="section">
+      <view class="section-title">2. 我们收集的信息</view>
+      <view class="paragraph">
+        <view class="sub-title">2.1 您提供的信息</view>
+        <view>- 账号信息：当您注册和使用我们的服务时，我们会收集您的微信昵称、头像等微信公开信息。</view>
+        <view>- 健身数据：包括您的训练计划、饮食记录、体重变化等信息。</view>
+      </view>
+      <view class="paragraph">
+        <view class="sub-title">2.2 自动收集的信息</view>
+        <view>- 设备信息：如设备型号、操作系统版本等。</view>
+        <view>- 使用情况：如您使用我们服务的频率、时长等信息。</view>
+      </view>
+    </view>
+    
+    <view class="section">
+      <view class="section-title">3. 信息使用</view>
+      <view class="paragraph">
+        我们使用收集到的信息主要用于：
+        <view>- 提供、维护和改进我们的服务</view>
+        <view>- 个性化您的使用体验</view>
+        <view>- 与您沟通并回应您的请求</view>
+        <view>- 分析用户行为，改进产品功能</view>
+      </view>
+    </view>
+    
+    <view class="section">
+      <view class="section-title">4. 信息共享</view>
+      <view class="paragraph">
+        除非获得您的明确同意，我们不会与第三方共享您的个人信息，但以下情况除外：
+        <view>- 根据法律法规要求必须提供</view>
+        <view>- 保护我们的权利和财产安全</view>
+        <view>- 防止欺诈或安全问题</view>
+      </view>
+    </view>
+    
+    <view class="section">
+      <view class="section-title">5. 数据安全</view>
+      <view class="paragraph">
+        我们采取合理的安全措施保护您的个人信息，防止未经授权的访问、披露或滥用。
+      </view>
+    </view>
+    
+    <view class="section">
+      <view class="section-title">6. 您的权利</view>
+      <view class="paragraph">
+        您有权访问、更正、删除您的个人信息，以及撤回对我们处理您个人信息的同意。
+      </view>
+    </view>
+    
+    <view class="section">
+      <view class="section-title">7. 政策更新</view>
+      <view class="paragraph">
+        我们可能会不时更新本隐私政策。更新后的政策将在小程序内公布，请定期查阅。
+      </view>
+    </view>
+    
+    <view class="section">
+      <view class="section-title">8. 联系我们</view>
+      <view class="paragraph">
+        如您对本隐私政策有任何疑问或建议，请通过以下方式联系我们：
+        <view class="contact-info">邮箱：support@fitcoach.com</view>
+      </view>
+    </view>
+  </view>
+</view> 

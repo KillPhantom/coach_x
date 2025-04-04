@@ -186,6 +186,16 @@
   cursor: pointer;
 }
 
+/* 添加学员按钮样式 */
+.add-btn-text {
+  display: flex;
+  align-items: center;
+  color: #3181ea;
+  font-size: 14px;
+  cursor: pointer;
+  margin-left: 8px;
+}
+
 .add-icon {
   margin-right: 4px;
   font-size: 16px;
@@ -254,4 +264,41 @@
   width: 100%;
   border-radius: 18px;
   text-align: center;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  margin-right: 10px;
+  background-color: #f1f1f1;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+}
+
+.refresh-icon {
+  font-size: 18px;
+}
+
+.refresh-btn.loading {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

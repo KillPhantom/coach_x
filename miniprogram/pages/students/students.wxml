@@ -38,8 +38,13 @@
   <!-- 学员列表标题 -->
   <view class="section-header">
     <view class="section-title">所有学员</view>
-    <view class="add-btn" bindtap="addNewStudent">
-      <text class="add-icon">+</text>添加学员
+    <view class="header-actions">
+      <view class="add-btn" bindtap="addNewStudent">
+        <text class="add-icon">+</text>添加学员
+      </view>
+            <view class="add-btn" bindtap="refreshList">
+        <text class="add-btn-text">⟳ 刷新</text>
+      </view>
     </view>
   </view>
   
@@ -60,15 +65,15 @@
     <block wx:else>
       <view class="student-card" 
             wx:for="{{students}}" 
-            wx:key="id"
+            wx:key="openId"
             bindtap="onStudentCardTap"
-            data-student-id="{{item.id}}">
-        <view class="avatar" style="{{item.avatarStyle}}">{{item.avatar}}</view>
+            data-openId="{{item.openId}}">
+        <image class="avatar" src="{{item.avatarUrl}}"></image>
         <view class="student-info">
-          <view class="student-name">{{item.name}}</view>
-          <view class="student-status" style="{{item.statusStyle}}">{{item.status}}</view>
-          <view>
-            <text class="tag {{item.tagClass}}">{{item.tag}}</text>
+          <view class="student-name">{{item.nickName}}</view>
+          <view class="student-status">{{item.status}}</view>
+          <view wx:for="{{item.tags}}" wx:key="tag" class="tag-container">
+            <text class="{{item.tagClass}}">{{item.tag}}</text>
           </view>
         </view>
         <view class="student-actions">
@@ -93,19 +98,4 @@
     </block>
   </scroll-view>
   
-  <!-- 底部导航栏 -->
-  <view class="tab-bar">
-    <view class="tab {{currentTab === 'assistant' ? 'active' : ''}}" bindtap="switchTab" data-tab="assistant">
-      <view class="tab-icon">🤖</view>
-      <view>AI助手</view>
-    </view>
-    <view class="tab {{currentTab === 'students' ? 'active' : ''}}" bindtap="switchTab" data-tab="students">
-      <view class="tab-icon">👥</view>
-      <view>学员</view>
-    </view>
-    <view class="tab {{currentTab === 'training' ? 'active' : ''}}" bindtap="switchTab" data-tab="training">
-      <view class="tab-icon">📋</view>
-      <view>训练计划</view>
-    </view>
-  </view>
 </view> 

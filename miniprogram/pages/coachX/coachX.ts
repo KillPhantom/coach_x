@@ -1,6 +1,5 @@
-// AI助手页面
-import { request } from "../../utils/request";
-
+import { IUserInfo, UserService } from "../../services/userService";
+import { IStudentsResult } from "../../services/fetchStudentsService";
 interface DailyStat {
   completedTrainings: number;
   needReminders: number;
@@ -12,64 +11,23 @@ interface AISuggestion {
   content: string;
   timestamp: string;
 }
-
-interface Student {
-  id: number;
-  name: string;
-  avatar: string;
-  avatarStyle: string;
-  status: string;
-  statusClass: string;
-  tag: string;
-  tagClass: string;
-  daysInactive: number;
-}
-
-// 添加需要回复的学员接口
-interface StudentMessage extends Student {
-  lastMessage: string;
-  messageTime: string;
-}
-
 Page({
   /**
    * 页面的初始数据
    */
   data: {
     statusBarHeight: 0,
-    currentPage: "ai-assistant-page", // 当前显示的页面
-    currentTab: "assistant", // 当前选中的标签页
     dailyStats: {} as DailyStat,
     aiSuggestion: {} as AISuggestion,
-    studentsNeedAttention: [] as Student[],
-    studentsNeedReply: [] as StudentMessage[],
+    studentsNeedAttention: [] as IUserInfo[],
+    studentsNeedReply: [] as IUserInfo[],
     loading: {
       dailyStats: true,
       aiSuggestion: true,
-      studentsNeedAttention: true,
-      studentsNeedReply: true,
+      studentsNeedAttention: false,
+      studentsNeedReply: false,
     },
     generatingReport: false,
-  },
-
-  /**
-   * 切换底部标签页
-   */
-  switchTab(e: any) {
-    const tab = e.currentTarget.dataset.tab;
-
-    if (tab === this.data.currentTab) return;
-
-    this.setData({
-      currentTab: tab,
-    });
-
-    // 根据标签切换页面
-    if (tab === "students") {
-      wx.redirectTo({ url: "/pages/students/students" });
-    } else if (tab === "training") {
-      wx.redirectTo({ url: "/pages/training/training" });
-    }
   },
 
   /**
@@ -175,38 +133,18 @@ Page({
       this.generateDailyReport();
     }
   },
-
-  /**
-   * 返回上一页
-   */
-  goBack() {
-    // 根据当前页面决定返回到哪个页面
-    if (this.data.currentPage === "student-detail-page") {
-      this.setData({ currentPage: "students-page" });
-    } else if (this.data.currentPage === "plan-detail-page") {
-      this.setData({ currentPage: "training-plan-page" });
-    } else {
-      this.setData({ currentPage: "ai-assistant-page" });
-    }
-  },
-
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad() {
-    // 获取系统信息
-    const systemInfo = wx.getSystemInfoSync();
-    const statusBarHeight = systemInfo.statusBarHeight;
-
-    // 设置标题栏高度
+    // 加载数  // 设置标题栏高度
+    const app = getApp();
     this.setData({
-      statusBarHeight: statusBarHeight,
+      statusBarHeight: app.globalData.statusBarHeight,
     });
-
-    // 加载数据
     this.fetchDailyStats();
     this.fetchAISuggestion();
-    this.fetchStudentsNeedAttention();
+    //this.fetchStudentsNeedAttention();
     this.fetchStudentsNeedReply();
   },
 
@@ -215,40 +153,14 @@ Page({
    */
   onReady() {},
 
-  /**
-   * 生命周期函数--监听页面显示
-   */
   onShow() {
-    // 页面显示时刷新数据
-    this.fetchDailyStats();
-    this.fetchStudentsNeedAttention();
-    this.fetchStudentsNeedReply();
+    // 确保正确设置当前页面的 tab 索引为 2 (训练计划)
+    if (typeof this.getTabBar === "function") {
+      this.getTabBar().setData({
+        selected: 0, // 训练计划页面的索引
+      });
+    }
   },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide() {},
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload() {},
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh() {},
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom() {},
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage() {},
 
   // 获取每日统计数据
   async fetchDailyStats() {
@@ -256,13 +168,6 @@ Page({
       this.setData({
         "loading.dailyStats": true,
       });
-
-      // 实际应用中应该从服务器获取数据
-      // const res = await request({
-      //   url: '/api/daily-stats',
-      //   method: 'GET'
-      // });
-
       // 模拟从服务器获取数据
       setTimeout(() => {
         const dailyStats = {
@@ -271,7 +176,6 @@ Page({
           plansToUpdate: 3,
           unreadMessages: 2,
         };
-
         this.setData({
           dailyStats,
           "loading.dailyStats": false,
@@ -332,72 +236,72 @@ Page({
   },
 
   // 获取需要关注的学员
-  async fetchStudentsNeedAttention() {
-    try {
-      this.setData({
-        "loading.studentsNeedAttention": true,
-      });
+  // async fetchStudentsNeedAttention() {
+  //   try {
+  //     this.setData({
+  //       "loading.studentsNeedAttention": true,
+  //     });
 
-      // 实际应用中应该从服务器获取数据
-      // const res = await request({
-      //   url: '/api/students-need-attention',
-      //   method: 'GET'
-      // });
+  //     // 实际应用中应该从服务器获取数据
+  //     // const res = await request({
+  //     //   url: '/api/students-need-attention',
+  //     //   method: 'GET'
+  //     // });
 
-      // 模拟从服务器获取数据
-      setTimeout(() => {
-        const studentsNeedAttention = [
-          {
-            id: 1,
-            name: "李四",
-            avatar: "李",
-            avatarStyle: "",
-            status: "2天未更新状态",
-            statusClass: "warning-status",
-            tag: "减脂期",
-            tagClass: "tag-cutting",
-            daysInactive: 2,
-          },
-          {
-            id: 2,
-            name: "钱七",
-            avatar: "钱",
-            avatarStyle: "",
-            status: "5天未更新状态",
-            statusClass: "warning-status",
-            tag: "减脂期",
-            tagClass: "tag-cutting",
-            daysInactive: 5,
-          },
-          {
-            id: 3,
-            name: "赵六",
-            avatar: "赵",
-            avatarStyle: "",
-            status: "训练计划即将到期",
-            statusClass: "info-status",
-            tag: "增肌期",
-            tagClass: "tag-bulking",
-            daysInactive: 1,
-          },
-        ];
+  //     // 模拟从服务器获取数据
+  //     setTimeout(() => {
+  //       const studentsNeedAttention = [
+  //         {
+  //           id: 1,
+  //           name: "李四",
+  //           avatar: "李",
+  //           avatarStyle: "",
+  //           status: "2天未更新状态",
+  //           statusClass: "warning-status",
+  //           tag: "减脂期",
+  //           tagClass: "tag-cutting",
+  //           daysInactive: 2,
+  //         },
+  //         {
+  //           id: 2,
+  //           name: "钱七",
+  //           avatar: "钱",
+  //           avatarStyle: "",
+  //           status: "5天未更新状态",
+  //           statusClass: "warning-status",
+  //           tag: "减脂期",
+  //           tagClass: "tag-cutting",
+  //           daysInactive: 5,
+  //         },
+  //         {
+  //           id: 3,
+  //           name: "赵六",
+  //           avatar: "赵",
+  //           avatarStyle: "",
+  //           status: "训练计划即将到期",
+  //           statusClass: "info-status",
+  //           tag: "增肌期",
+  //           tagClass: "tag-bulking",
+  //           daysInactive: 1,
+  //         },
+  //       ];
 
-        this.setData({
-          studentsNeedAttention,
-          "loading.studentsNeedAttention": false,
-        });
-      }, 500);
-    } catch (error) {
-      console.error("获取需要关注的学员失败", error);
-      wx.showToast({
-        title: "获取需要关注的学员失败",
-        icon: "none",
-      });
-      this.setData({
-        "loading.studentsNeedAttention": false,
-      });
-    }
-  },
+  //       this.setData({
+  //         studentsNeedAttention,
+  //         "loading.studentsNeedAttention": false,
+  //       });
+  //     }, 500);
+  //   } catch (error) {
+  //     console.error("获取需要关注的学员失败", error);
+  //     wx.showToast({
+  //       title: "获取需要关注的学员失败",
+  //       icon: "none",
+  //     });
+  //     this.setData({
+  //       "loading.studentsNeedAttention": false,
+  //     });
+  //   }
+  // },
 
   // 生成每日训练报告
   async generateDailyReport() {
@@ -500,49 +404,30 @@ Page({
       this.setData({
         "loading.studentsNeedReply": true,
       });
-
-      // 实际应用中应该从服务器获取数据
-      // const res = await request({
-      //   url: '/api/students-need-reply',
-      //   method: 'GET'
-      // });
-
-      // 模拟从服务器获取数据
-      setTimeout(() => {
-        const studentsNeedReply = [
-          {
-            id: 7,
-            name: "张三",
-            avatar: "张",
-            avatarStyle: "",
-            status: "",
-            statusClass: "",
-            tag: "增肌期",
-            tagClass: "tag-bulking",
-            daysInactive: 0,
-            lastMessage: "教练，我的肩膀有点酸痛，今天的训练...",
-            messageTime: "10:30",
+      const result = await wx.cloud.callFunction({
+        name: "fetchStudents",
+        data: {
+          pageSize: 200,
+          otherParams: {
+            need_reply: {
+              $eq: true,
+            },
           },
-          {
-            id: 8,
-            name: "王五",
-            avatar: "王",
-            avatarStyle: "",
-            status: "",
-            statusClass: "",
-            tag: "减脂期",
-            tagClass: "tag-cutting",
-            daysInactive: 0,
-            lastMessage: "请问今天的有氧训练需要做多久？",
-            messageTime: "昨天",
-          },
-        ];
+        },
+      });
+      const data = result.result as IStudentsResult;
+      console.log("data", data);
+      const parsedStudents = data.students.records.map((student: any) =>
+        UserService.parseUserInfo(student)
+      );
 
-        this.setData({
-          studentsNeedReply,
-          "loading.studentsNeedReply": false,
-        });
-      }, 500);
+      const students = parsedStudents
+        .concat(parsedStudents)
+        .concat(parsedStudents);
+      this.setData({
+        studentsNeedReply: students,
+        "loading.studentsNeedReply": false,
+      });
     } catch (error) {
       console.error("获取需要回复的学员失败", error);
       wx.showToast({
@@ -551,44 +436,6 @@ Page({
       });
       this.setData({
         "loading.studentsNeedReply": false,
-      });
-    }
-  },
-
-  // 查看学员消息
-  viewStudentMessage(e: any) {
-    const studentId = e.currentTarget.dataset.studentid;
-    const studentName = e.currentTarget.dataset.student;
-
-    if (studentId) {
-      wx.navigateTo({
-        url: `/pages/chat/chat?id=${studentId}&name=${studentName}`,
-        fail: (err) => {
-          console.error("导航到聊天页面失败:", err);
-          wx.showToast({
-            title: "页面跳转失败",
-            icon: "none",
-          });
-        },
-      });
-    }
-  },
-
-  // 回复学员
-  replyStudent(e: any) {
-    const studentId = e.currentTarget.dataset.studentid;
-    const studentName = e.currentTarget.dataset.student;
-
-    if (studentId) {
-      wx.navigateTo({
-        url: `/pages/chat/chat?id=${studentId}&name=${studentName}`,
-        fail: (err) => {
-          console.error("导航到聊天页面失败:", err);
-          wx.showToast({
-            title: "页面跳转失败",
-            icon: "none",
-          });
-        },
       });
     }
   },

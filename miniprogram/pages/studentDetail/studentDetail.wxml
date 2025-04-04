@@ -3,12 +3,16 @@
   <view class="back-button" bindtap="goBack">
     <text class="back-icon">←</text>
   </view>
-  <view class="header-title">学员详情</view>
+  <view class="header-title">个人详情</view>
 </view>
-
 <view class="container">
   <!-- 学员基本信息卡片 -->
   <view class="student-card">
+    <!-- 添加编辑按钮到卡片右上角 -->
+    <view class="edit-icon" wx:if="{{isCurrentUser}}" bindtap="toggleEditMode">
+      <text>{{isEditing ? '完成' : '编辑'}}</text>
+    </view>
+    
     <view class="student-info-header">
       <view class="avatar-container">
         <view class="avatar" style="{{student.avatarStyle}}">{{student.avatar}}</view>
@@ -18,15 +22,36 @@
           <text class="student-name">{{student.name}}</text>
           <text class="student-goal">{{student.goal}}</text>
         </view>
-        <text class="student-details">{{student.age}}岁 | {{student.height}}cm | 加入: {{student.joinDate}} | 到期: {{student.expirationDate}}</text>
+        
+        <!-- 出生日期 - 编辑模式/查看模式 -->
+        <view class="editable-field">
+          <text class="field-label">出生日期:</text>
+          <picker wx:if="{{isEditing}}" mode="date" value="{{student.bornDate}}" start="1950-01-01" end="{{today}}" bindchange="onBornDateChange">
+            <view class="edit-value">{{student.bornDate || '请选择日期'}}</view>
+          </picker>
+          <text wx:else class="student-details">{{student.bornDate}}</text>
+        </view>
+        
+        <!-- 身高 - 编辑模式/查看模式 -->
+        <view class="editable-field">
+          <text class="field-label">身高:</text>
+          <view wx:if="{{isEditing}}" class="height-input-container">
+            <input type="digit" class="height-input" value="{{student.height}}" bindinput="onHeightChange" />
+            <text class="unit">cm</text>
+          </view>
+          <text wx:else class="student-details">{{student.height}}cm</text>
+        </view>
+        
+        <text class="student-details">
+         加入: {{student.joinDate}}
+        </text>
+        <text class="student-details">
+         到期: {{student.expirationDate}}
+        </text>
       </view>
     </view>
-    
-    <view class="student-actions">
-
-    </view>
+    <view class="student-actions"></view>
   </view>
-  
   <!-- 体重变化图表 -->
   <view class="data-card">
     <view class="card-header">
@@ -34,10 +59,9 @@
       <text class="weight-change">{{weightChange}} (近6个月)</text>
     </view>
     <view class="chart-container">
-      <canvas canvas-id="weightChart" class="weight-chart"></canvas>
+      <canvas type="2d" id="weightChart" class="weight-chart"></canvas>
     </view>
   </view>
-  
   <!-- 关键数据卡片 -->
   <view class="data-card">
     <text class="card-title">关键数据</text>
@@ -59,14 +83,12 @@
       </view>
     </view>
   </view>
-  
   <!-- 身体围度数据 -->
   <view class="data-card">
     <view class="card-header">
       <text class="card-title">身体围度</text>
       <text class="unit-label">单位: cm</text>
     </view>
-    
     <view class="measurements-list">
       <view class="measurement-item" wx:for="{{measurements}}" wx:key="label">
         <text class="measurement-label">{{item.label}}</text>
@@ -77,4 +99,4 @@
       </view>
     </view>
   </view>
-</view> 
+</view>

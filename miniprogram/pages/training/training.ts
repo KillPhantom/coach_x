@@ -51,13 +51,11 @@ Page({
 
   onLoad() {
     // 获取系统信息
-    const systemInfo = wx.getSystemInfoSync();
-    const statusBarHeight = systemInfo.statusBarHeight;
 
     // 设置标题栏高度
+    const app = getApp();
     this.setData({
-      statusBarHeight: statusBarHeight,
-      currentTab: "training",
+      statusBarHeight: app.globalData.statusBarHeight,
     });
 
     // 加载数据
@@ -67,9 +65,12 @@ Page({
   },
 
   onShow() {
-    // 页面显示时刷新数据
-    this.fetchTemplates();
-    this.fetchStudents();
+    // 确保正确设置当前页面的 tab 索引为 2 (训练计划)
+    if (typeof this.getTabBar === "function") {
+      this.getTabBar().setData({
+        selected: 2, // 训练计划页面的索引
+      });
+    }
   },
 
   // 获取模板数据
@@ -365,24 +366,6 @@ Page({
         });
       },
     });
-  },
-
-  // 切换底部标签页
-  switchTab(e: any) {
-    const tab = e.currentTarget.dataset.tab;
-
-    if (tab === this.data.currentTab) return;
-
-    this.setData({
-      currentTab: tab,
-    });
-
-    // 根据标签切换页面
-    if (tab === "assistant") {
-      wx.redirectTo({ url: "/pages/coachX/coachX" });
-    } else if (tab === "students") {
-      wx.redirectTo({ url: "/pages/students/students" });
-    }
   },
 
   // 智能生成训练计划

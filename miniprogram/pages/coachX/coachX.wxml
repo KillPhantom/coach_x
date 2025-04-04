@@ -1,6 +1,6 @@
 <!-- AI助手页面 -->
 <view class="header" style="padding-top: {{statusBarHeight}}px;">CoachX 智能教练助手</view>
-<view class="container container-with-tabs" wx:if="{{currentPage === 'ai-assistant-page'}}">
+<view class="container container-with-tabs">
   <!-- 今日概览卡片 - 现代简洁设计 -->
   <view class="overview-card">
     <view class="overview-title">今日概览</view>
@@ -32,8 +32,7 @@
       AI总结报告
     </button>
   </view>
-
-    <!-- 需要回复的学员 - 新增部分 -->
+  <!-- 需要回复的学员 - 新增部分 -->
   <block>
     <view class="section-header">
       <view class="section-title">需要回复的学员</view>
@@ -43,11 +42,11 @@
     </view>
     <block wx:else>
       <view class="student-card unread-student" wx:for="{{studentsNeedReply}}" wx:key="id" bindtap="viewStudentMessage" data-student="{{item.name}}" data-studentId="{{item.id}}">
-        <view class="avatar unread-avatar">{{item.avatar}}</view>
+        <image class="avatar" src="{{item.avatarUrl}}"></image>
         <view class="student-info">
-          <view class="student-name">{{item.name}}</view>
-          <view class="student-status unread-status">{{item.lastMessage}}</view>
-          <view class="message-time">{{item.messageTime}}</view>
+          <view class="student-name">{{item.nickName}}</view>
+          <view class="student-status unread-status">{{item.lastActiveDate}}</view>
+          <view class="message-time">完成训练于 {{item.lastActiveTime}}</view>
         </view>
         <view>
           <button class="ai-action-button unread-button" catchtap="replyStudent" data-student="{{item.name}}" data-studentId="{{item.id}}">
@@ -83,35 +82,4 @@
       </view>
     </view>
   </block>
-  <!-- 底部导航栏 -->
-  <view class="tab-bar">
-    <view class="tab {{currentTab === 'assistant' ? 'active' : ''}}" bindtap="switchTab" data-tab="assistant">
-      <view class="tab-icon">🤖</view>
-      <view>AI助手</view>
-    </view>
-    <view class="tab {{currentTab === 'students' ? 'active' : ''}}" bindtap="switchTab" data-tab="students">
-      <view class="tab-icon">👥</view>
-      <view>学员</view>
-    </view>
-    <view class="tab {{currentTab === 'training' ? 'active' : ''}}" bindtap="switchTab" data-tab="training">
-      <view class="tab-icon">📋</view>
-      <view>训练计划</view>
-    </view>
-  </view>
-</view>
-<!-- 训练计划详情页面 -->
-<view class="container container-with-tabs" wx:if="{{currentPage === 'plan-detail-page'}}">
-  <!-- 训练计划详情内容 -->
-</view>
-<!-- 学员列表页面 -->
-<view class="container container-with-tabs" wx:if="{{currentPage === 'students-page'}}">
-  <!-- 学员列表内容 -->
-</view>
-<!-- 学员详情页面 -->
-<view class="container container-with-tabs" wx:if="{{currentPage === 'student-detail-page'}}">
-  <!-- 学员详情内容 -->
-</view>
-<!-- 训练计划页面 -->
-<view class="container container-with-tabs" wx:if="{{currentPage === 'training-plan-page'}}">
-  <!-- 训练计划内容 -->
 </view>

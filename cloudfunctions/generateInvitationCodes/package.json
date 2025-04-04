@@ -1,0 +1,15 @@
+{
+  "name": "generateInvitationCodes",
+  "version": "1.0.0",
+  "description": "批量生成邀请码并存入数据库",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@cloudbase/node-sdk": "3.7",
+    "crypto": "^1.0.1"
+  }
+}

@@ -31,6 +31,19 @@
       </view>
     </view>
     
+    <!-- 将审核状态移到上方 -->
+    <view class="review-status" wx:if="{{reviewStatus.isReviewed}}">
+      <view class="review-status-badge">
+        <text class="review-icon">✓</text>
+        <text class="review-text">已批阅</text>
+      </view>
+      <view class="review-time">{{reviewStatus.reviewTime}}</view>
+      <view class="review-comments" wx:if="{{reviewStatus.reviewComments}}">
+        <text class="comments-label">评语：</text>
+        <text class="comments-content">{{reviewStatus.reviewComments}}</text>
+      </view>
+    </view>
+    
     <!-- 完成情况概览 -->
     <view class="completion-overview">
       <view class="completion-item {{trainingCompletion.status}}">
@@ -100,7 +113,37 @@
             </view>
             
             <view class="workout-note" wx:if="{{exercise.note}}">
-              <text class="note-label">备注:</text> {{exercise.note}}
+              <text class="note-label">教练提示:</text>
+              <text class="note-content">{{exercise.note}}</text>
+            </view>
+            
+            <!-- 添加学员训练视频展示 -->
+            <view class="student-video-section" wx:if="{{exercise.videoUrl}}">
+              <view class="section-title">学员训练视频</view>
+              <video 
+                src="{{exercise.videoUrl}}" 
+                class="exercise-video"
+                object-fit="cover"
+                show-center-play-btn="true"
+                controls="true"
+              ></video>
+            </view>
+            
+            <!-- 添加学员问题展示 -->
+            <view class="student-question-section" wx:if="{{exercise.question}}">
+              <view class="section-title">学员问题</view>
+              <view class="question-content">
+                <text class="question-icon">❓</text>
+                <text class="question-text">{{exercise.question}}</text>
+              </view>
+              <view class="question-actions">
+                <button class="answer-button" bindtap="answerQuestion" data-exercise-index="{{exerciseIndex}}">回复问题</button>
+              </view>
+            </view>
+            
+            <view class="workout-feedback" wx:if="{{exercise.feedback}}">
+              <text class="feedback-label">学员反馈:</text>
+              <text class="feedback-content">{{exercise.feedback}}</text>
             </view>
           </view>
         </view>
@@ -230,11 +273,14 @@
       </view>
     </view>
     
-    <!-- 操作按钮 -->
+    <!-- 操作按钮 - 移除已批阅状态显示 -->
     <view class="action-buttons">
-      <button class="button button-primary" bindtap="sendFeedback">
-        <text class="button-icon">💬</text> 发送反馈
+      <!-- 添加审核按钮，如果已审核则显示"重新审核" -->
+      <button class="button {{reviewStatus.isReviewed ? 'button-outline' : 'button-review'}}" bindtap="reviewTraining">
+        <text class="button-icon">{{reviewStatus.isReviewed ? '🔄' : '✓'}}</text> 
+        {{reviewStatus.isReviewed ? '重新审核' : '批阅训练'}}
       </button>
+      
       <button class="button button-outline" bindtap="editPlan">
         <text class="button-icon">✏️</text> 编辑计划
       </button>

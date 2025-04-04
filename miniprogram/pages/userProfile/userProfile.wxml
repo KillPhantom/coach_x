@@ -1,0 +1,119 @@
+<!-- 用户个人资料页面 -->
+<view class="header" style="padding-top: {{statusBarHeight}}px;">
+  <view class="back-button" bindtap="goBack">
+    <text class="back-icon">←</text>
+  </view>
+  <view class="header-title">个人资料</view>
+</view>
+
+<view class="container">
+  <!-- 用户基本信息卡片 -->
+  <view class="user-card">
+    <view class="user-info-header">
+      <view class="avatar-container">
+        <view class="avatar" style="{{user.avatarStyle}}">{{user.avatar}}</view>
+      </view>
+      <view class="user-basic-info">
+        <view class="user-name-container">
+          <text class="user-name">{{user.name}}</text>
+          <text class="user-role">{{user.role === 'coach' ? '教练' : '学员'}}</text>
+        </view>
+        <block wx:if="{{user.role === 'student'}}">
+          <text class="user-details">{{user.age}}岁 | {{user.height}}cm | {{user.tags.join(' / ')}}</text>
+          <text class="join-date">加入日期: {{user.joinDate}} | 到期: {{user.expirationDate}}</text>
+        </block>
+        <block wx:else>
+          <text class="user-details">教练 | {{user.coachYears || 0}}年经验</text>
+        </block>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 学员特有功能区域 -->
+  <block wx:if="{{user.role === 'student'}}">
+    <!-- 体重变化图表 -->
+    <view class="data-card">
+      <view class="card-header">
+        <text class="card-title">体重变化</text>
+        <text class="weight-change">{{weightChange}} (近6个月)</text>
+      </view>
+      <view class="chart-container">
+        <canvas canvas-id="weightChart" class="weight-chart"></canvas>
+      </view>
+    </view>
+    
+    <!-- 个人信息编辑区域 -->
+    <view class="data-card">
+      <text class="card-title">个人信息</text>
+      <view class="profile-edit-section">
+        <view class="edit-item">
+          <text class="edit-label">年龄</text>
+          <view class="edit-value-container">
+            <input type="number" value="{{user.age}}" bindinput="onAgeChange" class="edit-input" />
+            <text class="unit">岁</text>
+          </view>
+        </view>
+        
+        <view class="edit-item">
+          <text class="edit-label">身高</text>
+          <view class="edit-value-container">
+            <input type="digit" value="{{user.height}}" bindinput="onHeightChange" class="edit-input" />
+            <text class="unit">cm</text>
+          </view>
+        </view>
+        
+        <view class="edit-item">
+          <text class="edit-label">当前体重</text>
+          <view class="edit-value-container">
+            <input type="digit" value="{{user.weight}}" bindinput="onWeightChange" class="edit-input" />
+            <text class="unit">kg</text>
+          </view>
+        </view>
+        
+        <view class="edit-item">
+          <text class="edit-label">目标</text>
+          <picker bindchange="onGoalChange" value="{{goalIndex}}" range="{{goals}}">
+            <view class="picker-value">{{goals[goalIndex]}}</view>
+          </picker>
+        </view>
+        
+        <view class="edit-item">
+          <text class="edit-label">教练</text>
+          <text class="edit-value">{{user.coachName || '未分配'}}</text>
+        </view>
+        
+        <view class="edit-item">
+          <text class="edit-label">会员到期</text>
+          <picker mode="date" value="{{user.expirationDate}}" start="{{today}}" bindchange="onExpirationDateChange">
+            <view class="picker-value">{{user.expirationDate}}</view>
+          </picker>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 训练统计 -->
+    <view class="data-card">
+      <text class="card-title">训练统计</text>
+      <view class="stats-container">
+        <view class="stat-item">
+          <text class="stat-value">{{stats.totalWorkouts || 0}}</text>
+          <text class="stat-label">总训练次数</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-value">{{stats.completedWorkouts || 0}}</text>
+          <text class="stat-label">已完成训练</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-value">{{stats.completionRate || '0%'}}</text>
+          <text class="stat-label">完成率</text>
+        </view>
+      </view>
+    </view>
+  </block>
+  
+  <!-- 所有用户通用操作区域 -->
+  <view class="action-area">
+    <button class="action-button save-button" bindtap="saveChanges" wx:if="{{user.role === 'student'}}">保存修改</button>
+    <button class="action-button logout-button" bindtap="logout">退出登录</button>
+  </view>
+</view> 

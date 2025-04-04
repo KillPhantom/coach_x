@@ -91,15 +91,10 @@ Page({
   } as PageData,
 
   onLoad(options) {
-    // 获取系统信息
-    const systemInfo = wx.getSystemInfoSync();
-    const statusBarHeight = systemInfo.statusBarHeight;
-
     // 设置标题栏高度
+    const app = getApp();
     this.setData({
-      statusBarHeight: statusBarHeight,
-      previousPage: options.from || "training", // 记录来源页面
-      currentTab: options.from || "training", // 设置当前标签页
+      statusBarHeight: app.globalData.statusBarHeight,
     });
 
     // 检查是否是新计划
@@ -204,29 +199,6 @@ Page({
   // 返回上一页
   goBack() {
     wx.navigateBack();
-  },
-
-  // 切换底部标签页
-  switchTab(e: any) {
-    const tab = e.currentTarget.dataset.tab;
-    this.setData({
-      currentTab: tab,
-    });
-
-    // 根据标签页跳转到相应页面
-    if (tab !== this.data.previousPage) {
-      wx.redirectTo({
-        url: `../${tab}/${tab}`,
-      });
-    }
-  },
-
-  // 切换计划标签页
-  switchPlanTab(e: any) {
-    const tab = e.currentTarget.dataset.tab;
-    this.setData({
-      activeTab: tab,
-    });
   },
 
   // 应用AI建议

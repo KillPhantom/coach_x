@@ -1,13 +1,15 @@
 {
   "pages": [
+    "pages/login/login",
+    "pages/privacyPolicy/privacyPolicy",
     "pages/coachX/coachX",
     "pages/students/students",
     "pages/training/training",
     "pages/planDetail/planDetail",
     "pages/todayTraining/todayTraining",
-    "pages/index/index",
     "pages/logs/logs",
-    "pages/studentDetail/studentDetail"
+    "pages/studentDetail/studentDetail",
+    "pages/student/student"
   ],
   "window": {
     "navigationBarTextStyle": "white",
@@ -25,9 +27,33 @@
       "desc": "您的位置信息将用于为您提供更好的服务"
     }
   },
-  "requiredPrivateInfos": [
-    "chooseLocation"
-  ],
+  "requiredPrivateInfos": ["chooseLocation"],
+  "tabBar": {
+    "custom": true,
+    "color": "#999999",
+    "selectedColor": "#07C160",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/coachX/coachX",
+        "text": "首页",
+        "iconPath": "images/icons/home.png",
+        "selectedIconPath": "images/icons/home.png"
+      },
+      {
+        "pagePath": "pages/students/students",
+        "text": "学员",
+        "iconPath": "images/icons/student.png",
+        "selectedIconPath": "images/icons/student.png"
+      },
+      {
+        "pagePath": "pages/training/training",
+        "text": "训练计划",
+        "iconPath": "images/icons/plan.png",
+        "selectedIconPath": "images/icons/plan.png"
+      }
+    ]
+  },
   "usingComponents": {},
   "shareOptions": {
     "showShareMenu": true

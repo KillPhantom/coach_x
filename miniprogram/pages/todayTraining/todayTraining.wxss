@@ -35,6 +35,8 @@
 }
 
 .content-wrapper {
+  width: 100%;
+  box-sizing: border-box;
   padding: 15px;
 }
 
@@ -128,6 +130,8 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 15px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .completion-item {
@@ -138,6 +142,8 @@
   margin: 0 5px;
   display: flex;
   align-items: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .completion-item:first-child {
@@ -225,10 +231,14 @@
 /* 训练动作内容样式 */
 .tab-content {
   margin-bottom: 20px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .plan-day {
   margin-bottom: 15px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .day-title {
@@ -245,6 +255,8 @@
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .workout-item.completed {
@@ -338,13 +350,18 @@
 }
 
 .no-training {
+  width: 100%;
+  padding: 30px 15px;
   text-align: center;
-  padding: 30px 0;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  box-sizing: border-box;
 }
 
 .no-training-text {
+  font-size: 16px;
   color: #999;
-  font-size: 14px;
 }
 
 /* 饮食计划内容样式 */
@@ -378,6 +395,8 @@
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .meal-container.completed {
@@ -478,6 +497,8 @@
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .supplement-header {
@@ -527,6 +548,71 @@
 
 .supplement-item-status {
   font-size: 12px;
+}
+
+/* 修改审核状态样式，使其适合在页面上方显示 */
+.review-status {
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 15px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.review-status-badge {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.review-icon {
+  color: #52c41a;
+  font-size: 16px;
+  margin-right: 6px;
+}
+
+.review-text {
+  color: #52c41a;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.review-time {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.review-comments {
+  font-size: 13px;
+  color: #333;
+  line-height: 1.5;
+}
+
+.comments-label {
+  font-weight: 500;
+  margin-right: 4px;
+}
+
+.comments-content {
+  color: #666;
+}
+
+/* 调整操作按钮布局 */
+.action-buttons {
+  display: flex;
+  flex-direction: row; /* 改回水平排列 */
+  gap: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.action-buttons .button {
+  flex: 1;
 }
 
 /* 操作按钮样式 */
@@ -609,4 +695,62 @@
   font-size: 12px;
   color: #666;
   margin-top: 5px;
+}
+
+/* 添加学员视频和问题相关样式 */
+.student-video-section, .student-question-section {
+  margin-top: 12px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.exercise-video {
+  width: 100%;
+  height: 180px;
+  border-radius: 8px;
+}
+
+.question-content {
+  display: flex;
+  align-items: flex-start;
+  background-color: white;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.question-icon {
+  color: #1890ff;
+  font-size: 16px;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.question-text {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.5;
+}
+
+.question-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.answer-button {
+  background-color: #1890ff;
+  color: white;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 16px;
+  line-height: 1.5;
+  margin: 0;
 } 

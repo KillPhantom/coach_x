@@ -1,8 +1,8 @@
 // 学生训练详情页面
-import { request } from "../../utils/request";
-
-interface Student {
-  id: number;
+import { UserService, IUserInfo } from "../../services/userService";
+import { DateUtils } from "../../utils/dateUtils";
+export interface Student {
+  id: string;
   name: string;
   avatar: string;
   avatarStyle: string;
@@ -12,40 +12,42 @@ interface Student {
   planName: string;
 }
 
-interface ExerciseSet {
+export interface ExerciseReps {
   weight: string;
-  reps: string;
-  completed: boolean;
+  reps: number;
 }
 
-interface Exercise {
+export interface Exercise {
   name: string;
-  sets: ExerciseSet[];
+  sets: ExerciseReps[];
   note?: string;
   feedback?: string;
   completed: boolean;
+  videoUrl?: string;
+  question?: string;
+  answer?: string;
 }
 
-interface TrainingDay {
+export interface TrainingDay {
   day: string;
   focus: string;
   exercises: Exercise[];
 }
 
-interface MealFood {
+export interface MealFood {
   name: string;
   amount: string;
-  completed: boolean;
 }
 
-interface Meal {
+export interface Meal {
   name: string;
   time: string;
   foods: MealFood[];
   completed: boolean;
+  imageUrl?: string;
 }
 
-interface DietPlan {
+export interface DietPlan {
   calories: number;
   protein: number;
   carbs: number;
@@ -54,7 +56,7 @@ interface DietPlan {
   notes?: string;
 }
 
-interface Supplement {
+export interface Supplement {
   name: string;
   dosage: string;
   morning: string;
@@ -100,41 +102,53 @@ Page({
     morningSupplementsCompleted: false,
     noonSupplementsCompleted: false,
     eveningSupplementsCompleted: false,
+    reviewStatus: {
+      isReviewed: false,
+      reviewTime: "",
+      reviewComments: "",
+    },
+    currentUser: {} as IUserInfo,
   },
 
   onLoad(options) {
-    // 获取系统信息
-    const systemInfo = wx.getSystemInfoSync();
-    const statusBarHeight = systemInfo.statusBarHeight;
-
-    // 设置标题栏高度
+    // Get user info and set to data
+    const currentUser = UserService.getCurrentUser()!;
     this.setData({
-      statusBarHeight: statusBarHeight,
+      currentUser: currentUser,
     });
 
+    // 设置标题栏高度
+    const app = getApp();
+    this.setData({
+      statusBarHeight: app.globalData.statusBarHeight,
+    });
     // 获取学员ID
-    const studentId = parseInt(options.id || "1");
+    const studentId = options.id || "";
 
     // 设置当前日期
     const today = new Date();
-    const formattedDate = this.formatDate(today);
+    const formattedDate = DateUtils.formatDate(today);
 
     this.setData({
       selectedDate: formattedDate,
       isToday: true,
+      student: { id: studentId } as Student,
     });
 
     // 加载数据
-    this.fetchStudentData(studentId);
-    this.fetchTrainingData(studentId, formattedDate);
-  },
+    this.fetchStudentData();
+    this.fetchTrainingData();
 
-  // 格式化日期为 YYYY-MM-DD
-  formatDate(date: Date): string {
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
-    return `${year}-${month}-${day}`;
+    // 模拟获取审核状态
+    const mockReviewStatus = {
+      isReviewed: false,
+      reviewTime: "",
+      reviewComments: "",
+    };
+
+    this.setData({
+      reviewStatus: mockReviewStatus,
+    });
   },
 
   // 解析日期字符串为 Date 对象
@@ -144,18 +158,11 @@ Page({
   },
 
   // 获取学员数据
-  async fetchStudentData(studentId: number) {
+  async fetchStudentData() {
     try {
-      // 实际应用中应该从服务器获取数据
-      // const res = await request({
-      //   url: `/api/students/${studentId}`,
-      //   method: 'GET'
-      // });
-
-      // 模拟从服务器获取数据
       setTimeout(() => {
         const student = {
-          id: studentId,
+          id: this.data.student.id,
           name: "张三",
           avatar: "张",
           avatarStyle: "",
@@ -179,61 +186,73 @@ Page({
   },
 
   // 获取训练数据
-  async fetchTrainingData(studentId: number, date: string) {
+  async fetchTrainingData() {
     try {
       wx.showLoading({
         title: "加载中...",
       });
-
-      // 实际应用中应该从服务器获取数据
-      // const res = await request({
-      //   url: `/api/students/${studentId}/training`,
-      //   method: 'GET',
-      //   data: { date }
-      // });
-
-      // 模拟从服务器获取数据
-      setTimeout(() => {
-        // 获取训练日数据
-        const trainingDay = this.getMockTrainingDay(date);
-
-        // 获取饮食计划数据
-        const dietPlan = this.getMockDietPlan(date);
-
-        // 获取补剂数据
-        const supplements = this.getMockSupplements(date);
-
-        // 计算完成情况
-        const trainingCompletion =
-          this.calculateTrainingCompletion(trainingDay);
-        const dietCompletion = this.calculateDietCompletion(dietPlan);
-        const supplementCompletion =
-          this.calculateSupplementCompletion(supplements);
-
-        this.setData({
-          trainingDay,
-          dietPlan,
-          supplements,
-          supplementNotes:
-            "乳清蛋白在训练后30分钟内服用，肌酸每天保持摄入，不需要周期性使用。",
-          trainingCompletion,
-          dietCompletion,
-          supplementCompletion,
+      wx.cloud
+        .callFunction({
+          name: "fetchTodayTraining",
+          data: {
+            student_id: this.data.student.id,
+            coach_id: this.data.currentUser.openId, // 可选
+            date: this.data.selectedDate, // 格式: YYYY-MM-DD
+          },
+        })
+        .then((res) => {
+          console.log("训练数据:", res.result);
+        })
+        .catch((err) => {
+          console.error("获取训练数据失败", err);
+          wx.hideLoading();
+          wx.showToast({
+            title: "获取训练数据失败",
+            icon: "none",
+          });
         });
 
-        // 计算各时段补剂完成情况
-        this.calculateSupplementsByTimeOfDay();
+      // setTimeout(() => {
+      //   // 获取训练日数据
+      //   const trainingDay = this.getMockTrainingDay(date);
 
-        wx.hideLoading();
-      }, 1000);
+      //   // 获取饮食计划数据
+      //   const dietPlan = this.getMockDietPlan(date);
+
+      //   // 获取补剂数据
+      //   const supplements = this.getMockSupplements(date);
+
+      //   // 计算完成情况
+      //   const trainingCompletion =
+      //     this.calculateTrainingCompletion(trainingDay);
+      //   const dietCompletion = this.calculateDietCompletion(dietPlan);
+      //   const supplementCompletion =
+      //     this.calculateSupplementCompletion(supplements);
+
+      //   this.setData({
+      //     trainingDay,
+      //     dietPlan,
+      //     supplements,
+      //     supplementNotes:
+      //       "乳清蛋白在训练后30分钟内服用，肌酸每天保持摄入，不需要周期性使用。",
+      //     trainingCompletion,
+      //     dietCompletion,
+      //     supplementCompletion,
+      //   });
+
+      //   // 计算各时段补剂完成情况
+      //   this.calculateSupplementsByTimeOfDay();
+
+      //   wx.hideLoading();
+      // }, 1000);
     } catch (error) {
       console.error("获取训练数据失败", error);
-      wx.hideLoading();
       wx.showToast({
         title: "获取训练数据失败",
         icon: "none",
       });
     }
+    wx.hideLoading();
   },
 
   // 计算训练完成情况
@@ -389,7 +408,7 @@ Page({
   // 日期选择器变更
   onDateChange(e: any) {
     const selectedDate = e.detail.value;
-    const today = this.formatDate(new Date());
+    const today = DateUtils.formatDate(new Date());
     const isToday = selectedDate === today;
 
     this.setData({
@@ -398,14 +417,36 @@ Page({
     });
 
     // 重新加载数据
-    this.fetchTrainingData(this.data.student.id, selectedDate);
+    this.fetchTrainingData();
+
+    // 获取新日期的审核状态
+    // 实际应用中应该从服务器获取审核状态
+    // request({
+    //   url: `/api/training-review/${this.data.student.id}/${selectedDate}`,
+    //   method: 'GET'
+    // }).then(res => {
+    //   this.setData({
+    //     reviewStatus: res.data
+    //   });
+    // });
+
+    // 模拟获取审核状态
+    const mockReviewStatus = {
+      isReviewed: false,
+      reviewTime: "",
+      reviewComments: "",
+    };
+
+    this.setData({
+      reviewStatus: mockReviewStatus,
+    });
   },
 
   // 前一天
   previousDay() {
     const currentDate = this.parseDate(this.data.selectedDate);
     currentDate.setDate(currentDate.getDate() - 1);
-    const newDate = this.formatDate(currentDate);
+    const newDate = DateUtils.formatDate(currentDate);
 
     this.onDateChange({
       detail: {
@@ -418,27 +459,11 @@ Page({
   nextDay() {
     const currentDate = this.parseDate(this.data.selectedDate);
     currentDate.setDate(currentDate.getDate() + 1);
-    const newDate = this.formatDate(currentDate);
+    const newDate = DateUtils.formatDate(currentDate);
 
     this.onDateChange({
       detail: {
         value: newDate,
-      },
-    });
-  },
-
-  // 发送反馈
-  sendFeedback() {
-    wx.showModal({
-      title: "发送反馈",
-      content: "确定要向学员发送反馈消息吗？",
-      success: (res) => {
-        if (res.confirm) {
-          wx.showToast({
-            title: "反馈已发送",
-            icon: "success",
-          });
-        }
       },
     });
   },
@@ -450,12 +475,41 @@ Page({
     });
   },
 
-  // 模拟获取训练日数据
+  // 添加回复问题的方法
+  answerQuestion(e: any) {
+    const exerciseIndex = e.currentTarget.dataset.exerciseIndex;
+    const exercise = this.data.trainingDay?.exercises[exerciseIndex];
+
+    if (!exercise) return;
+
+    wx.showModal({
+      title: "回复学员问题",
+      content: exercise.question || "",
+      editable: true,
+      placeholderText: "请输入您的回复...",
+      success: (res) => {
+        if (res.confirm && res.content) {
+          // 实际应用中应该发送回复到服务器
+          wx.showToast({
+            title: "回复已发送",
+            icon: "success",
+          });
+
+          // 可以选择在本地更新问题状态
+          // const trainingDay = {...this.data.trainingDay};
+          // trainingDay.exercises[exerciseIndex].questionAnswered = true;
+          // this.setData({ trainingDay });
+        }
+      },
+    });
+  },
+
+  // 修改 getMockTrainingDay 方法，添加视频和问题数据
   getMockTrainingDay(date: string): TrainingDay | null {
     // 根据日期返回不同的训练日数据
     const dayOfWeek = this.parseDate(date).getDay(); // 0 是周日，1-6 是周一到周六
 
-    // 模拟周一、周三、周五有训练
+    // 修改周一的训练数据，添加视频和问题
     if (dayOfWeek === 1) {
       // 周一
       return {
@@ -465,33 +519,41 @@ Page({
           {
             name: "平板杠铃卧推",
             sets: [
-              { weight: "60kg", reps: "12次", completed: true },
-              { weight: "70kg", reps: "10次", completed: true },
-              { weight: "80kg", reps: "8次", completed: false },
-              { weight: "85kg", reps: "6次", completed: false },
+              { weight: "60kg", reps: 12 },
+              { weight: "70kg", reps: 8 },
+              { weight: "80kg", reps: 8 },
+              { weight: "85kg", reps: 9 },
             ],
             note: "注意肩膀下沉，胸部挺起",
             feedback: "最后两组没有完成，感觉力量不足",
             completed: false,
+            videoUrl: "https://example.com/videos/bench_press.mp4", // 示例视频URL
+            question:
+              "教练，我在做最后两组时感觉右肩有点疼，这是正常的吗？我应该如何调整姿势？", // 示例问题
           },
           {
             name: "上斜哑铃卧推",
             sets: [
-              { weight: "22kg", reps: "12次", completed: true },
-              { weight: "24kg", reps: "10次", completed: true },
-              { weight: "26kg", reps: "8次", completed: true },
+              { weight: "60kg", reps: 12 },
+              { weight: "70kg", reps: 8 },
+              { weight: "80kg", reps: 8 },
+              { weight: "85kg", reps: 9 },
             ],
             completed: true,
+            videoUrl: "https://example.com/videos/incline_press.mp4",
           },
           {
             name: "坐姿哑铃肩推",
             sets: [
-              { weight: "18kg", reps: "12次", completed: true },
-              { weight: "20kg", reps: "10次", completed: true },
-              { weight: "22kg", reps: "8次", completed: false },
+              { weight: "60kg", reps: 12 },
+              { weight: "70kg", reps: 8 },
+              { weight: "80kg", reps: 8 },
+              { weight: "85kg", reps: 9 },
             ],
             feedback: "最后一组感觉肩部疲劳",
             completed: false,
+            question:
+              "教练，我做肩推时感觉不到肩部发力，更多是手臂在用力，有什么技巧吗？",
           },
         ],
       };
@@ -504,18 +566,20 @@ Page({
           {
             name: "引体向上",
             sets: [
-              { weight: "体重", reps: "10次", completed: true },
-              { weight: "体重", reps: "8次", completed: true },
-              { weight: "体重", reps: "6次", completed: true },
+              { weight: "60kg", reps: 12 },
+              { weight: "70kg", reps: 8 },
+              { weight: "80kg", reps: 8 },
+              { weight: "85kg", reps: 9 },
             ],
             completed: true,
           },
           {
             name: "坐姿划船",
             sets: [
-              { weight: "60kg", reps: "12次", completed: true },
-              { weight: "70kg", reps: "10次", completed: true },
-              { weight: "80kg", reps: "8次", completed: true },
+              { weight: "60kg", reps: 12 },
+              { weight: "70kg", reps: 8 },
+              { weight: "80kg", reps: 8 },
+              { weight: "85kg", reps: 9 },
             ],
             completed: true,
           },
@@ -530,10 +594,10 @@ Page({
           {
             name: "杠铃深蹲",
             sets: [
-              { weight: "80kg", reps: "12次", completed: false },
-              { weight: "90kg", reps: "10次", completed: false },
-              { weight: "100kg", reps: "8次", completed: false },
-              { weight: "110kg", reps: "6次", completed: false },
+              { weight: "60kg", reps: 12 },
+              { weight: "70kg", reps: 8 },
+              { weight: "80kg", reps: 8 },
+              { weight: "85kg", reps: 9 },
             ],
             note: "注意膝盖不要超过脚尖",
             completed: false,
@@ -541,9 +605,10 @@ Page({
           {
             name: "腿举",
             sets: [
-              { weight: "120kg", reps: "12次", completed: false },
-              { weight: "140kg", reps: "10次", completed: false },
-              { weight: "160kg", reps: "8次", completed: false },
+              { weight: "60kg", reps: 12 },
+              { weight: "70kg", reps: 8 },
+              { weight: "80kg", reps: 8 },
+              { weight: "85kg", reps: 9 },
             ],
             completed: false,
           },
@@ -713,5 +778,52 @@ Page({
     }
 
     return baseSupplements;
+  },
+
+  // 添加审核训练的方法
+  reviewTraining() {
+    wx.showModal({
+      title: "审核训练",
+      content: "请输入对学员今日训练的总体评价",
+      editable: true,
+      placeholderText: "例如：整体表现不错，注意加强胸肌发力...",
+      success: (res) => {
+        if (res.confirm) {
+          // 获取当前时间
+          const now = new Date();
+          const reviewTime = `${now.getFullYear()}-${String(
+            now.getMonth() + 1
+          ).padStart(2, "0")}-${String(now.getDate()).padStart(
+            2,
+            "0"
+          )} ${String(now.getHours()).padStart(2, "0")}:${String(
+            now.getMinutes()
+          ).padStart(2, "0")}`;
+
+          // 更新审核状态
+          this.setData({
+            "reviewStatus.isReviewed": true,
+            "reviewStatus.reviewTime": reviewTime,
+            "reviewStatus.reviewComments": res.content || "已审核",
+          });
+
+          // 实际应用中应该将审核状态保存到服务器
+          // request({
+          //   url: `/api/training-review/${this.data.student.id}/${this.data.selectedDate}`,
+          //   method: 'POST',
+          //   data: {
+          //     isReviewed: true,
+          //     reviewTime: reviewTime,
+          //     reviewComments: res.content || "已审核"
+          //   }
+          // });
+
+          wx.showToast({
+            title: "审核完成",
+            icon: "success",
+          });
+        }
+      },
+    });
   },
 });

@@ -74,19 +74,4 @@
     </view>
   </view>
   
-  <!-- 底部导航栏 -->
-  <view class="tab-bar">
-    <view class="tab {{currentTab === 'assistant' ? 'active' : ''}}" bindtap="switchTab" data-tab="assistant">
-      <view class="tab-icon">🤖</view>
-      <view>AI助手</view>
-    </view>
-    <view class="tab {{currentTab === 'students' ? 'active' : ''}}" bindtap="switchTab" data-tab="students">
-      <view class="tab-icon">👥</view>
-      <view>学员</view>
-    </view>
-    <view class="tab {{currentTab === 'training' ? 'active' : ''}}" bindtap="switchTab" data-tab="training">
-      <view class="tab-icon">📋</view>
-      <view>训练计划</view>
-    </view>
-  </view>
 </view> 

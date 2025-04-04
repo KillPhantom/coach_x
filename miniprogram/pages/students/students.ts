@@ -1,16 +1,8 @@
-// 学员管理页面
-import { request } from "../../utils/request";
-
-interface Student {
-  id: number;
-  name: string;
-  avatar: string;
-  avatarStyle: string;
-  status: string;
-  statusStyle: string;
-  tag: string;
-  tagClass: string;
-}
+import {
+  FetchStudentsService,
+  IPagination,
+} from "../../services/fetchStudentsService";
+import { IUserInfo } from "../../services/userService";
 
 interface StudentStats {
   total: number;
@@ -21,30 +13,26 @@ interface StudentStats {
 Page({
   data: {
     statusBarHeight: 0,
-    currentTab: "students",
-    filterOptions: ["所有学员", "活跃学员", "需要关注", "需要回复", "新学员"],
+    filterOptions: ["所有学员", "活跃学员", "需要关注", "需要回复"],
     filterIndex: 0,
     searchText: "",
-    students: [] as Student[],
     stats: {} as StudentStats,
-    loading: {
-      students: true,
-      stats: true,
-    },
+    loading: false,
+    students: [] as IUserInfo[],
     pagination: {
-      page: 1,
-      pageSize: 10,
-      hasMore: true,
-    },
+      total: 0,
+      pageSize: 30,
+      pageNumber: 1,
+      totalPages: 0,
+    } as IPagination,
     scrollHeight: 0,
-    isLoadingMore: false,
+    hasMore: true,
   },
 
   onLoad() {
     // 获取系统信息
     const systemInfo = wx.getSystemInfoSync();
     const statusBarHeight = systemInfo.statusBarHeight;
-
     // 设置标题栏高度和滚动区域高度
     // 只需减去标题栏和底部导航栏的高度
     this.setData({
@@ -54,12 +42,26 @@ Page({
 
     // 加载数据
     this.fetchStudentStats();
-    this.fetchStudents(true);
+    this.fetchStudents();
   },
 
   onShow() {
-    // 页面显示时刷新数据
-    this.fetchStudentStats();
+    // 确保正确设置当前页面的 tab 索引为 2 (训练计划)
+    if (typeof this.getTabBar === "function") {
+      this.getTabBar().setData({
+        selected: 1, // 训练计划页面的索引
+      });
+    }
+    // 如果页面重新显示，检查缓存是否过期
+    if (!FetchStudentsService.isCacheValid()) {
+      this.fetchStudents();
+    } else {
+      // 使用缓存更新UI
+      this.setData({
+        students: FetchStudentsService.getCachedStudents(),
+        pagination: FetchStudentsService.getPagination(),
+      });
+    }
   },
 
   // 获取学员统计数据
@@ -68,13 +70,6 @@ Page({
       this.setData({
         "loading.stats": true,
       });
-
-      // 实际应用中应该从服务器获取数据
-      // const res = await request({
-      //   url: '/api/student-stats',
-      //   method: 'GET'
-      // });
-
       // 模拟从服务器获取数据
       setTimeout(() => {
         const stats = {
@@ -101,150 +96,67 @@ Page({
   },
 
   // 获取学员列表数据
-  async fetchStudents(refresh = false) {
+  async fetchStudents() {
+    this.setData({ loading: true, error: "" });
     try {
-      // 如果是刷新，重置分页
-      if (refresh) {
-        this.setData({
-          "pagination.page": 1,
-          "pagination.hasMore": true,
-          students: [],
-          "loading.students": true,
-        });
-      } else {
-        // 如果是加载更多，设置加载状态
-        this.setData({
-          isLoadingMore: true,
-        });
-      }
-
-      // 如果没有更多数据，直接返回
-      if (!refresh && !this.data.pagination.hasMore) {
-        this.setData({
-          isLoadingMore: false,
-        });
-        return;
-      }
-
-      const { page, pageSize } = this.data.pagination;
-      const filterType = this.data.filterOptions[this.data.filterIndex];
-      const searchText = this.data.searchText;
-
-      // 实际应用中应该从服务器获取数据
-      // const res = await request({
-      //   url: '/api/students',
-      //   method: 'GET',
-      //   data: {
-      //     page,
-      //     pageSize,
-      //     filterType,
-      //     searchText
-      //   }
-      // });
-
-      // 模拟从服务器获取数据
-      setTimeout(() => {
-        // 模拟根据筛选条件和搜索文本过滤数据
-        let filteredStudents = [];
-
-        // 生成模拟数据
-        const generateStudents = (count: number, startId: number) => {
-          const students = [];
-          const statuses = ["活跃", "需要关注", "需要回复", "新学员"];
-          const tags = ["增肌期", "减脂期", "维持期"];
-          const tagClasses = ["tag-bulking", "tag-cutting", "tag-maintenance"];
-
-          for (let i = 0; i < count; i++) {
-            const id = startId + i;
-            const name = `学员${id}`;
-            const statusIndex = Math.floor(Math.random() * 4);
-            const tagIndex = Math.floor(Math.random() * 3);
-
-            students.push({
-              id,
-              name,
-              avatar: name.substring(0, 1),
-              avatarStyle: "",
-              status: statuses[statusIndex],
-              statusStyle:
-                statusIndex === 1
-                  ? "color: #ff4d4f;"
-                  : statusIndex === 2
-                  ? "color: #f5222d;"
-                  : "",
-              tag: tags[tagIndex],
-              tagClass: tagClasses[tagIndex],
-            });
-          }
-
-          return students;
-        };
-
-        // 根据当前页码生成数据
-        const startId = (page - 1) * pageSize + 1;
-        const hasMore = page < 3; // 模拟只有3页数据
-
-        // 模拟最后一页数据量可能不足pageSize
-        const count = hasMore
-          ? pageSize
-          : Math.floor(Math.random() * pageSize) + 1;
-        filteredStudents = generateStudents(count, startId);
-
-        // 如果有搜索文本，模拟过滤
-        if (searchText) {
-          filteredStudents = filteredStudents.filter((student) =>
-            student.name.includes(searchText)
-          );
-        }
-
-        // 如果有筛选条件，模拟过滤
-        if (filterType !== "所有学员") {
-          filteredStudents = filteredStudents.filter((student) => {
-            if (filterType === "活跃学员") return student.status === "活跃";
-            if (filterType === "需要关注") return student.status === "需要关注";
-            if (filterType === "需要回复") return student.status === "需要回复";
-            if (filterType === "新学员") return student.status === "新学员";
-            return true;
-          });
-        }
-
-        this.setData({
-          students: refresh
-            ? filteredStudents
-            : [...this.data.students, ...filteredStudents],
-          "loading.students": false,
-          isLoadingMore: false,
-          "pagination.page": page + 1,
-          "pagination.hasMore": hasMore,
-        });
-      }, 800);
-    } catch (error) {
-      console.error("获取学员列表数据失败", error);
-      wx.showToast({
-        title: "获取学员列表数据失败",
-        icon: "none",
-      });
+      const result = await FetchStudentsService.fetchStudents();
       this.setData({
-        "loading.students": false,
-        isLoadingMore: false,
+        students: result.students,
+        pagination: result.pagination,
+        loading: false,
+        hasMore: result.pagination.totalPages > result.pagination.pageNumber,
+      });
+      console.log("page data is", this.data);
+    } catch (err) {
+      this.setData({
+        loading: false,
+        error: "加载学生列表失败",
       });
     }
+    console.log("students", this.data.students);
+  },
+
+  generateMockedStudents(count: number, startId: number) {
+    const students = [];
+    const statuses = ["活跃", "需要关注", "需要回复", "新学员"];
+    const tags = ["增肌期", "减脂期", "维持期"];
+    const tagClasses = ["tag-bulking", "tag-cutting", "tag-maintenance"];
+
+    for (let i = 0; i < count; i++) {
+      const id = startId + i;
+      const name = `学员${id}`;
+      const statusIndex = Math.floor(Math.random() * 4);
+      const tagIndex = Math.floor(Math.random() * 3);
+
+      students.push({
+        id,
+        name,
+        avatar: name.substring(0, 1),
+        avatarStyle: "",
+        status: statuses[statusIndex],
+        statusStyle:
+          statusIndex === 1
+            ? "color: #ff4d4f;"
+            : statusIndex === 2
+            ? "color: #f5222d;"
+            : "",
+        tag: tags[tagIndex],
+        tagClass: tagClasses[tagIndex],
+      });
+    }
+    return students;
   },
 
   // 搜索输入
   onSearchInput(e: any) {
-    this.setData({
-      searchText: e.detail.value,
-    });
-
-    // 实现防抖，避免频繁请求
-    if (this.searchTimer) {
-      clearTimeout(this.searchTimer);
+    const searchText = e.detail.value;
+    // 如果有搜索文本，模拟过滤
+    if (searchText) {
+      const filteredStudents = this.data.students.filter((student) =>
+        student.nickName.includes(searchText)
+      );
+      this.setData({ students: filteredStudents });
     }
-
-    this.searchTimer = setTimeout(() => {
-      this.fetchStudents(true);
-    }, 500);
   },
 
   // 过滤选择
@@ -254,33 +166,7 @@ Page({
     });
 
     // 切换筛选条件后重新加载数据
-    this.fetchStudents(true);
-  },
-
-  // 查看AI分组建议
-  viewAIGroups() {
-    wx.showToast({
-      title: "查看AI分组建议",
-      icon: "none",
-    });
-
-    // 实际应用中可以跳转到AI分组建议页面
-    // wx.navigateTo({
-    //   url: '/pages/aiGroups/aiGroups'
-    // });
-  },
-
-  // 管理学员
-  manageStudents() {
-    wx.showToast({
-      title: "管理学员",
-      icon: "none",
-    });
-
-    // 实际应用中可以跳转到学员管理页面
-    // wx.navigateTo({
-    //   url: '/pages/manageStudents/manageStudents'
-    // });
+    this.fetchStudents();
   },
 
   // 添加新学员
@@ -291,66 +177,53 @@ Page({
       mask: true,
     });
 
-    // 模拟从后端获取邀请码
-    setTimeout(() => {
-      wx.hideLoading();
-
-      // 生成随机邀请码
-      const inviteCode = Math.random()
-        .toString(36)
-        .substring(2, 10)
-        .toUpperCase();
-
-      // 显示邀请码模态框
-      wx.showModal({
-        title: "添加新学员",
-        content: `邀请码已生成: ${inviteCode}\n您可以将此邀请码分享给学员`,
-        confirmText: "分享",
-        cancelText: "关闭",
-        success: (res) => {
-          if (res.confirm) {
-            // 用户点击了分享按钮
-            wx.showShareMenu({
-              withShareTicket: true,
-              menus: ["shareAppMessage", "shareTimeline"],
-            });
-
-            // 调用分享接口
-            wx.shareAppMessageToGroup({
-              title: "邀请您加入我的训练计划",
-              desc: `请使用邀请码 ${inviteCode} 加入`,
-              path: "/pages/join/join?inviteCode=" + inviteCode,
-            });
-          }
-
-          // 无论用户是否分享，都刷新学员列表和统计数据
-        },
-      });
-    }, 1000);
-  },
-
-  // 切换底部标签页
-  switchTab(e: any) {
-    const tab = e.currentTarget.dataset.tab;
-
-    if (tab === this.data.currentTab) return;
-
-    this.setData({
-      currentTab: tab,
+    wx.cloud.callFunction({
+      name: "generateStudentInvitationCode",
+      data: {},
+      success: (res: any) => {
+        if (res.result.success) {
+          wx.showModal({
+            title: "添加新学员",
+            content: `邀请码已生成: ${res.result.code}\n您可以将此邀请码分享给学员`,
+            confirmText: "分享",
+            cancelText: "关闭",
+            success: (res) => {
+              if (res.confirm) {
+                // 用户点击了分享按钮
+                wx.showShareMenu({
+                  withShareTicket: true,
+                  menus: ["shareAppMessage"],
+                });
+              }
+              // 无论用户是否分享，都刷新学员列表和统计数据
+            },
+          });
+        } else {
+          // 显示失败消息
+          wx.showModal({
+            title: "生成失败",
+            content: res.result.message || "未知错误",
+            showCancel: false,
+          });
+        }
+      },
+      fail: (err) => {
+        console.error("生成邀请码失败", err);
+        wx.showModal({
+          title: "操作失败",
+          content: "生成邀请码时发生错误，请稍后再试",
+          showCancel: false,
+        });
+      },
+      complete: () => {
+        wx.hideLoading();
+      },
     });
-
-    // 根据标签切换页面
-    if (tab === "assistant") {
-      wx.redirectTo({ url: "/pages/coachX/coachX" });
-    } else if (tab === "training") {
-      wx.redirectTo({ url: "/pages/training/training" });
-    }
   },
 
-  // 滚动到底部，加载更多
   onScrollToLower() {
-    if (!this.data.isLoadingMore && this.data.pagination.hasMore) {
-      this.fetchStudents(false);
+    if (!this.data.loading && this.data.hasMore) {
+      this.fetchStudents();
     }
   },
 
@@ -386,7 +259,24 @@ Page({
     });
 
     // 重新加载学员数据
-    this.fetchStudents(true);
+    this.fetchStudents();
+  },
+
+  async refreshList() {
+    console.log("refreshList was clicked");
+    this.setData({ loading: true, error: "" });
+    try {
+      const result = await FetchStudentsService.refreshStudents();
+      this.setData({
+        students: result.students,
+        pagination: result.pagination,
+        loading: false,
+      });
+    } catch (err) {
+      this.setData({
+        loading: false,
+      });
+    }
   },
 
   // 在 Page 对象中添加分享方法
@@ -413,7 +303,7 @@ Page({
     const studentId = e.currentTarget.dataset.studentId;
 
     wx.showActionSheet({
-      itemList: ["查看学员详情", "邀请加入群聊", "删除学员"],
+      itemList: ["查看学员详情", "编辑计划", "删除学员"],
       success: (res) => {
         switch (res.tapIndex) {
           case 0:
@@ -422,7 +312,7 @@ Page({
             break;
           case 1:
             // 邀请加入群聊
-            this.inviteToGroup(studentId);
+            this.editStudentPlan(studentId);
             break;
           case 2:
             // 删除学员
@@ -436,28 +326,28 @@ Page({
   // 搜索学员
   searchStudents() {
     // 直接使用当前输入框中的文本进行搜索
-    this.fetchStudents(true);
-
+    this.fetchStudents();
     // 收起键盘
     wx.hideKeyboard();
   },
 
   // 添加学员卡片点击事件处理函数
   onStudentCardTap(e: any) {
-    const studentId = e.currentTarget.dataset.studentId;
-
-    if (studentId) {
-      wx.navigateTo({
-        url: `../todayTraining/todayTraining?id=${studentId}`,
-        fail: (err) => {
-          console.error("导航到今日训练详情页面失败:", err);
-          wx.showToast({
-            title: "页面跳转失败",
-            icon: "none",
-          });
-        },
-      });
+    const studentId = e.currentTarget.dataset.openid;
+    if (!studentId) {
+      console.error("No student ID found");
+      return;
     }
+    wx.navigateTo({
+      url: `/pages/todayTraining/todayTraining?id=${studentId}`,
+      fail: (err) => {
+        console.error("导航到今日训练详情页面失败:", err);
+        wx.showToast({
+          title: "页面跳转失败",
+          icon: "none",
+        });
+      },
+    });
   },
 
   // 添加查看学员详情的函数
@@ -466,6 +356,20 @@ Page({
       url: `../studentDetail/studentDetail?id=${studentId}`,
       fail: (err) => {
         console.error("导航到学员详情页面失败:", err);
+        wx.showToast({
+          title: "页面跳转失败",
+          icon: "none",
+        });
+      },
+    });
+  },
+
+  // 添加查看学员详情的函数
+  editStudentPlan(studentId: number) {
+    wx.navigateTo({
+      url: `../planDetail/planDetail?id=${studentId}`,
+      fail: (err) => {
+        console.error("导航到学员计划页面失败:", err);
         wx.showToast({
           title: "页面跳转失败",
           icon: "none",
@@ -498,7 +402,7 @@ Page({
           });
 
           // 刷新学员列表和统计数据
-          this.fetchStudents(true);
+          this.fetchStudents();
           this.fetchStudentStats();
         }
       },
